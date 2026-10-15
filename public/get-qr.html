@@ -1,21 +1,28 @@
 <script>
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('qrDetailsForm');
   const successMsg = document.getElementById('successMessage');
   const submitBtn = document.getElementById('submitBtn');
   const hiddenProductType = document.getElementById('hiddenProductType');
+  const tagSelect = document.getElementById('tagType');
 
+  // Safety check — if any element is missing, stop silently
+  if (!form || !submitBtn || !tagSelect) return;
+
+  // Pre-select tag type from URL (?type=bike)
   const urlParams = new URLSearchParams(window.location.search);
   const preselectedType = urlParams.get('type');
   if (preselectedType && ['bike', 'car', 'luggage'].includes(preselectedType)) {
-    document.getElementById('tagType').value = preselectedType;
-    hiddenProductType.value = preselectedType;
+    tagSelect.value = preselectedType;
+    if (hiddenProductType) hiddenProductType.value = preselectedType;
   }
 
-  document.getElementById('tagType').addEventListener('change', (e) => {
-    hiddenProductType.value = e.target.value;
+  // Update hidden field when dropdown changes
+  tagSelect.addEventListener('change', (e) => {
+    if (hiddenProductType) hiddenProductType.value = e.target.value;
   });
 
+  // Handle form submission
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
@@ -49,7 +56,7 @@
       const data = await res.json();
       console.log('Saved lead ID:', data.id);
 
-      successMsg.style.display = 'block';
+      if (successMsg) successMsg.style.display = 'block';
       submitBtn.textContent = '✓ Details saved';
       submitBtn.style.background = '#2e7d32';
       submitBtn.style.borderColor = '#2e7d32';
@@ -61,5 +68,5 @@
       submitBtn.textContent = 'Create my BharatSafe ID ↗';
     }
   });
-})();
+});
 </script>
