@@ -1,0 +1,65 @@
+<script>
+(function () {
+  const form = document.getElementById('qrDetailsForm');
+  const successMsg = document.getElementById('successMessage');
+  const submitBtn = document.getElementById('submitBtn');
+  const hiddenProductType = document.getElementById('hiddenProductType');
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselectedType = urlParams.get('type');
+  if (preselectedType && ['bike', 'car', 'luggage'].includes(preselectedType)) {
+    document.getElementById('tagType').value = preselectedType;
+    hiddenProductType.value = preselectedType;
+  }
+
+  document.getElementById('tagType').addEventListener('change', (e) => {
+    hiddenProductType.value = e.target.value;
+  });
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const payload = {
+      fullName:  form.fullName.value.trim(),
+      phone:     form.contactNumber.value.trim(),
+      email:     form.email.value.trim(),
+      address:   form.address.value.trim(),
+      bloodGroup: form.bloodGroup.value,
+      tagType:   form.tagType.value,
+      emergencyContact: '',
+      note: ''
+    };
+
+    if (!payload.fullName || !payload.phone || !payload.email ||
+        !payload.address || !payload.bloodGroup || !payload.tagType) {
+      alert('Please fill in all the fields.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving…';
+
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('Server error');
+      const data = await res.json();
+      console.log('Saved lead ID:', data.id);
+
+      successMsg.style.display = 'block';
+      submitBtn.textContent = '✓ Details saved';
+      submitBtn.style.background = '#2e7d32';
+      submitBtn.style.borderColor = '#2e7d32';
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      alert('Could not save. Please try again.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create my BharatSafe ID ↗';
+    }
+  });
+})();
+</script>
