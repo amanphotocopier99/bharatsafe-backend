@@ -1,51 +1,76 @@
 const express = require('express');
 const requireAuth = require('../middleware/auth');
+const Lead = require('../models/Lead');
 const router = express.Router();
 
-router.post('/', (req, res) => {
-  const db = req.app.locals.db;
-  const { fullName, phone, email, address, bloodGroup, tagType, emergencyContact, note } = req.body || {};
+// POST /api/leads — save a new form submission
+router.post('/', async (req, res) => {
+  try {
+    const { fullName, phone, email, address, bloodGroup, tagType, emergencyContact, note } = req.body || {};
 
-  if (!fullName || !phone || !email || !address || !bloodGroup || !tagType) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    if (!fullName || !phone || !email || !address || !bloodGroup || !tagType) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const lead = await Lead.create({
+      full_name: fullName,
+      phone,
+      email,
+      address,
+      blood_group: bloodGroup,
+      tag_type: tagType,
+      emergency_contact: emergencyContact || null,
+      note: note || null
+    });
+
+    res.status(201).json({ id: lead._id, ok: true });
+  } catch (err) {
+    console.error('Save lead error:', err.message);
+    res.status(500).json({ error: 'Failed to save lead' });
   }
-
-  const info = db.prepare(`
-    INSERT INTO leads (full_name, phone, email, address, blood_group, tag_type, emergency_contact, note)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(fullName, phone, email, address, bloodGroup, tagType, emergencyContact || null, note || null);
-
-  res.status(201).json({ id: info.lastInsertRowid, ok: true });
 });
 
-router.get('/', requireAuth, (req, res) => {
-  const rows = req.app.locals.db.prepare(`
-    SELECT * FROM leads ORDER BY datetime(created_at) DESC, id DESC
-  `).all();
-  res.json(rows);
+// GET /api/leads — admin panel fetch
+router.get('/', requireAuth, async (req, res) => {
+  try {
+    const leads = await Lead.find().sort({ created_at: -1, _id: -1 });
+    res.json(leads);
+  } catch (err) {
+    console.error('Fetch leads error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch leads' });
+  }
 });
 
-router.patch('/:id', requireAuth, (req, res) => {
-  const db = req.app.locals.db;
-  const { status, note, emergencyContact } = req.body || {};
-  const existing = db.prepare('SELECT * FROM leads WHERE id = ?').get(req.params.id);
-  if (!existing) return res.status(404).json({ error: 'Not found' });
+// PATCH /api/leads/:id — update status, note, emergency contact
+router.patch('/:id', requireAuth, async (req, res) => {
+  try {
+    const { status, note, emergencyContact } = req.body || {};
 
-  db.prepare(`
-    UPDATE leads
-    SET status = COALESCE(?, status),
-        note = COALESCE(?, note),
-        emergency_contact = COALESCE(?, emergency_contact)
-    WHERE id = ?
-  `).run(status ?? null, note ?? null, emergencyContact ?? null, req.params.id);
+    const update = {};
+    if (status !== undefined) update.status = status;
+    if (note !== undefined) update.note = note;
+    if (emergencyContact !== undefined) update.emergency_contact = emergencyContact;
 
-  res.json(db.prepare('SELECT * FROM leads WHERE id = ?').get(req.params.id));
+    const lead = await Lead.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!lead) return res.status(404).json({ error: 'Not found' });
+
+    res.json(lead);
+  } catch (err) {
+    console.error('Update lead error:', err.message);
+    res.status(500).json({ error: 'Failed to update lead' });
+  }
 });
 
-router.delete('/:id', requireAuth, (req, res) => {
-  const info = req.app.locals.db.prepare('DELETE FROM leads WHERE id = ?').run(req.params.id);
-  if (!info.changes) return res.status(404).json({ error: 'Not found' });
-  res.json({ ok: true });
+// DELETE /api/leads/:id
+router.delete('/:id', requireAuth, async (req, res) => {
+  try {
+    const lead = await Lead.findByIdAndDelete(req.params.id);
+    if (!lead) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Delete lead error:', err.message);
+    res.status(500).json({ error: 'Failed to delete lead' });
+  }
 });
 
 module.exports = router;
