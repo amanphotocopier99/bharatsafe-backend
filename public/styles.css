@@ -226,7 +226,7 @@
    ============================================ */
 .brand img {
   display: block;
-  height: 40px;
+  height: 205px;
   width: auto;
   object-fit: contain;
 }
@@ -239,11 +239,4 @@
   .brand img {
     height: 32px;
   }
-}/* Logo in header */
-.brand-logo {
-  height: 800px;
-  width: auto;
-  object-fit: contain;
-  display: block;
 }
-
