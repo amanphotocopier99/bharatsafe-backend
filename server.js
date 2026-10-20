@@ -21,14 +21,20 @@ mongoose.connect(MONGODB_URI)
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
+
+// Serve static files from public/ (logo.png lives here)
 app.use(express.static(path.join(__dirname, 'public')));
 
+// API routes
 app.use('/api', require('./routes/auth'));
 app.use('/api/leads', require('./routes/leads'));
-
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
+// SPA fallback — do NOT swallow file or API requests
 app.get('*', (req, res) => {
+  if (req.path.startsWith('/api') || path.extname(req.path)) {
+    return res.status(404).send('Not found');
+  }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
