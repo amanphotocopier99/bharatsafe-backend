@@ -239,4 +239,11 @@
   .brand img {
     height: 32px;
   }
+}/* Logo in header */
+.brand-logo {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
+
