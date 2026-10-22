@@ -266,109 +266,66 @@
     }
 }
 /* General Footer Styling */
+/* General Footer Styling */
 .site-footer {
-  background-color: #1a1a1a; /* Dark background matching your screenshot */
+  background-color: #1a1a1a; /* Dark background */
   color: #e0e0e0;
-  padding: 40px 20px 20px 20px;
+  padding: 50px 20px 30px 20px; /* More padding on top */
   font-family: sans-serif;
-  font-size: 14px;
 }
 
 .footer-container {
-  max-width: 1200px;
-  margin: 0 auto; /* Centers the content block */
-}
-
-/* --- ROW 1: Logo & Tagline --- */
-.footer-top {
+  max-width: 1000px;
+  margin: 0 auto;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #333; /* Subtle separator line */
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-  flex-wrap: wrap; /* Allows wrapping on mobile */
-  gap: 20px;
+  flex-direction: column; /* Stacks elements vertically */
+  align-items: center;    /* Centers everything horizontally */
+  text-align: center;
 }
 
-/* Logo Styling */
-.footer-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.footer-logo {
-  /* ADJUST THIS SIZE */
-  height: 40px; 
-  width: auto;
-  display: block;
-}
-
-.brand-name {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #fff;
-}
-
-/* Tagline */
-.footer-tagline {
-  margin: 0;
-  color: #aaa;
-  font-size: 14px;
-}
-
-/* --- ROW 2: Navigation Links --- */
-.footer-middle {
+/* --- Logo Section --- */
+.footer-logo-section {
   margin-bottom: 25px;
 }
 
+.footer-logo {
+  height: 50px; /* Adjust this to make your logo bigger or smaller */
+  width: auto;
+  display: block;
+  /* If your logo is dark and hard to see on black, add a filter to make it white: */
+  /* filter: brightness(0) invert(1); */ 
+}
+
+/* --- Links Section --- */
 .footer-nav {
   display: flex;
-  gap: 25px; /* Space between links */
-  flex-wrap: wrap;
+  gap: 30px; /* Space between links */
+  flex-wrap: wrap; /* Allows links to wrap on small screens */
+  justify-content: center;
+  margin-bottom: 30px; /* Space between links and copyright */
 }
 
 .footer-nav a {
-  color: #fff;
+  color: #e0e0e0;
   text-decoration: none;
+  font-size: 15px;
   font-weight: 500;
   transition: color 0.2s;
 }
 
 .footer-nav a:hover {
-  color: #ff4d4d; /* Adds a red hover effect to match your theme */
+  color: #ff4d4d; /* Red hover effect */
 }
 
-/* --- ROW 3: Copyright --- */
+/* --- Copyright Section --- */
 .footer-bottom {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #777;
-  border-top: 1px solid #333;
+  border-top: 1px solid #333; /* Separator line */
+  width: 100%; /* Makes the line stretch across */
   padding-top: 20px;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
-.footer-bottom a {
-  color: #777;
-  text-decoration: none;
-}
-
-.footer-bottom a:hover {
-  text-decoration: underline;
-}
-
-/* Responsive adjustments for mobile */
-@media (max-width: 600px) {
-  .footer-top {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .footer-bottom {
-    flex-direction: column;
-    gap: 5px;
-  }
+.footer-bottom p {
+  margin: 0;
+  font-size: 13px;
+  color: #888; /* Dimmer text for copyright */
 }
