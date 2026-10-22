@@ -266,7 +266,6 @@
     }
 }
 /* Footer Background */
-/* Footer Background */
 .site-footer {
   background-color: #1a1a1a;
   color: #e0e0e0;
@@ -296,7 +295,7 @@
 }
 
 .footer-logo {
-  height: 100px !important; /* INCREASE THIS NUMBER TO MAKE LOGO BIGGER */
+  height: 300px !important; /* INCREASE THIS NUMBER TO MAKE LOGO BIGGER */
   width: auto !important;
   max-width: 100%; /* Prevents overflow on small screens */
   display: block;
