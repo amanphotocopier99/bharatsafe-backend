@@ -265,31 +265,110 @@
         display: none; /* You'll need a hamburger menu for mobile later */
     }
 }
-/* Footer Styling */
+/* General Footer Styling */
 .site-footer {
-    padding: 40px 5vw;
-    border-top: 1px solid var(--line);
-    display: flex;
-    justify-content: center; /* Centers the footer content */
-    align-items: center;
+  background-color: #1a1a1a; /* Dark background matching your screenshot */
+  color: #e0e0e0;
+  padding: 40px 20px 20px 20px;
+  font-family: sans-serif;
+  font-size: 14px;
 }
 
-.footer-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto; /* Centers the content block */
 }
 
-/* Size of the footer logo */
-.footer-logo {
-    height: 40px; /* Adjust this size as needed */
-    width: auto;
-    object-fit: contain;
+/* --- ROW 1: Logo & Tagline --- */
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333; /* Subtle separator line */
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Allows wrapping on mobile */
+  gap: 20px;
 }
 
+/* Logo Styling */
 .footer-brand {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-logo {
+  /* ADJUST THIS SIZE */
+  height: 40px; 
+  width: auto;
+  display: block;
+}
+
+.brand-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Tagline */
+.footer-tagline {
+  margin: 0;
+  color: #aaa;
+  font-size: 14px;
+}
+
+/* --- ROW 2: Navigation Links --- */
+.footer-middle {
+  margin-bottom: 25px;
+}
+
+.footer-nav {
+  display: flex;
+  gap: 25px; /* Space between links */
+  flex-wrap: wrap;
+}
+
+.footer-nav a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.footer-nav a:hover {
+  color: #ff4d4d; /* Adds a red hover effect to match your theme */
+}
+
+/* --- ROW 3: Copyright --- */
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #777;
+  border-top: 1px solid #333;
+  padding-top: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.footer-bottom a {
+  color: #777;
+  text-decoration: none;
+}
+
+.footer-bottom a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 600px) {
+  .footer-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    gap: 5px;
+  }
 }
