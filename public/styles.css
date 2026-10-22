@@ -266,23 +266,25 @@
     }
 }
 /* Footer Background */
+/* Footer Background */
 .site-footer {
   background-color: #1a1a1a;
   color: #e0e0e0;
-  padding: 50px 20px 30px 20px;
+  padding: 60px 20px 30px 20px; /* Added more padding on top */
   font-family: sans-serif;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* Container to force everything to the center */
+/* Container forcing center alignment */
 .footer-container {
   max-width: 1000px;
   margin: 0 auto !important; 
   display: flex !important;
   flex-direction: column !important;
-  align-items: center !important; /* Forces children to center */
-  text-align: center !important;
+  align-items: center !important; /* Centers items horizontally */
+  justify-content: center !important;
+  text-align: center !important;  /* Centers text */
 }
 
 /* --- Logo Styling --- */
@@ -294,15 +296,16 @@
 }
 
 .footer-logo {
-  height: 80px !important; /* INCREASE LOGO SIZE HERE */
+  height: 100px !important; /* INCREASE THIS NUMBER TO MAKE LOGO BIGGER */
   width: auto !important;
+  max-width: 100%; /* Prevents overflow on small screens */
   display: block;
 }
 
 /* --- Links Styling --- */
 .footer-nav {
   display: flex !important;
-  justify-content: center !important;
+  justify-content: center !important; /* Forces links to center */
   gap: 30px;
   flex-wrap: wrap;
   margin-bottom: 30px;
@@ -326,7 +329,8 @@
   width: 100%;
   padding-top: 20px;
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Centers copyright text */
+  text-align: center;
 }
 
 .footer-bottom p {
