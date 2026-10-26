@@ -239,6 +239,12 @@
   }
 }
 
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
 .site-footer {
   background-color: #1a1a1a;
   color: #e0e0e0;
@@ -280,8 +286,9 @@
 .footer-nav {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 12px 20px;
+  gap: 12px 24px;
   margin-bottom: 16px;
 }
 
@@ -309,6 +316,10 @@
 }
 
 @media (max-width: 768px) {
+  .site-nav {
+    gap: 16px;
+  }
+
   .footer-container {
     grid-template-columns: minmax(0, 1fr);
     gap: 18px;
