@@ -20,9 +20,9 @@
     @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; gap: 0; } .form-card { padding: 1.75rem 1.25rem; } .form-card h1 { font-size: 2rem; } }
     .button-full { width: 100%; justify-content: center; padding: 1rem 1.5rem; font-size: 1rem; margin-top: .5rem; cursor: pointer; }
     .back-link { display: inline-block; margin-top: 1.5rem; font-size: .95rem; color: #1e1e1e; text-decoration: none; border-bottom: 1px solid rgba(0,0,0,.2); padding-bottom: .1rem; }
-    .success-message { display: none; background: #e6f7e6; border-radius: 20px; padding: 1.5rem; margin-top: 2rem; border-left: 6px solid #2e7d32; }
-    .success-message p { margin: 0; color: #1e3a1e; font-weight: 500; }
-    .success-message small { display: block; margin-top: .5rem; color: #2e5e2e; }
+    .checkout-notice { display: none; background: #fff6dd; border-radius: 16px; padding: 1.25rem; margin-top: 1.5rem; border-left: 5px solid #d39b18; }
+    .checkout-notice p { margin: 0; color: #51400f; font-weight: 500; }
+    .checkout-notice small { display: block; margin-top: .5rem; color: #66551f; }
   </style>
 </head>
 <body>
@@ -45,67 +45,53 @@
       <div class="form-card">
         <div class="section-kicker">
           <span>YOUR BHARATSAFE</span>
-          <span>(STEP 1 OF 1)</span>
+          <span>(STEP 1 OF 2)</span>
         </div>
-        <h1>Almost there.<br><em>Just a few details.</em></h1>
+        <h1>Buy your<br><em>BharatSafe tag.</em></h1>
         <p style="margin-bottom:2rem;color:#4a4a4a;font-size:1.05rem;">
-          Fill in your emergency information and choose your tag type. We'll link it to your unique QR code.
+          Enter your contact and delivery details, choose a product, then continue to payment.
         </p>
 
-        <form id="qrDetailsForm" novalidate>
+        <form id="qrDetailsForm">
           <div class="form-group">
             <label for="fullName">Full name</label>
-            <input type="text" id="fullName" name="fullName" placeholder="e.g. Arjun Sharma" required>
+            <input type="text" id="fullName" name="fullName" autocomplete="name" placeholder="e.g. Arjun Sharma" required>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label for="contactNumber">Contact number</label>
-              <input type="tel" id="contactNumber" name="contactNumber" placeholder="+91 98765 43210" required>
+              <input type="tel" id="contactNumber" name="contactNumber" autocomplete="tel" placeholder="+91 98765 43210" required>
             </div>
             <div class="form-group">
               <label for="email">Email address</label>
-              <input type="email" id="email" name="email" placeholder="you@example.com" required>
+              <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="address">Address</label>
-            <input type="text" id="address" name="address" placeholder="Street, city, state" required>
+            <label for="address">Delivery address</label>
+            <input type="text" id="address" name="address" autocomplete="street-address" placeholder="Street, city, state, PIN code" required>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="bloodGroup">Blood group</label>
-              <select id="bloodGroup" name="bloodGroup" required>
-                <option value="" disabled selected>Select blood group</option>
-                <option>A+</option><option>A-</option>
-                <option>B+</option><option>B-</option>
-                <option>O+</option><option>O-</option>
-                <option>AB+</option><option>AB-</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="tagType">Tag type</label>
-              <select id="tagType" name="tagType" required>
-                <option value="" disabled selected>Select tag type</option>
-                <option value="bike">Bike</option>
-                <option value="car">Car</option>
-                <option value="luggage">Luggage</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label for="tagType">Product</label>
+            <select id="tagType" name="tagType" required>
+              <option value="" disabled selected>Select a product</option>
+              <option value="bike">Bike tag — ₹149</option>
+              <option value="car">Car tag — ₹149</option>
+              <option value="luggage">Luggage tag — ₹149</option>
+            </select>
           </div>
-
-          <input type="hidden" name="productType" id="hiddenProductType" value="">
 
           <button type="submit" class="button button-dark button-full" id="submitBtn">
-            Create my BharatSafe ID <span aria-hidden="true">↗</span>
+            Continue to payment <span aria-hidden="true">↗</span>
           </button>
         </form>
 
-        <div class="success-message" id="successMessage">
-          <p>✓ Details saved — your BharatSafe QR is on its way.</p>
-          <small>Check your email for confirmation. You can update your info anytime.</small>
+        <div class="checkout-notice" id="checkoutNotice" role="status" aria-live="polite">
+          <p>Online payment is not available yet.</p>
+          <small>Your details have not been submitted, and no order or payment has been created. Please try again after checkout is set up.</small>
         </div>
 
         <a href="index.html" class="back-link">← Back to home</a>
@@ -132,68 +118,21 @@
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('qrDetailsForm');
-    const successMsg = document.getElementById('successMessage');
-    const submitBtn = document.getElementById('submitBtn');
-    const hiddenProductType = document.getElementById('hiddenProductType');
+    const checkoutNotice = document.getElementById('checkoutNotice');
     const tagSelect = document.getElementById('tagType');
 
-    if (!form || !submitBtn || !tagSelect) return;
+    if (!form || !checkoutNotice || !tagSelect) return;
 
     const urlParams = new URLSearchParams(window.location.search);
     const preselectedType = urlParams.get('type');
     if (preselectedType && ['bike', 'car', 'luggage'].includes(preselectedType)) {
       tagSelect.value = preselectedType;
-      if (hiddenProductType) hiddenProductType.value = preselectedType;
     }
 
-    tagSelect.addEventListener('change', (e) => {
-      if (hiddenProductType) hiddenProductType.value = e.target.value;
-    });
-
-    form.addEventListener('submit', async function (e) {
+    form.addEventListener('submit', function (e) {
       e.preventDefault();
-
-      const payload = {
-        fullName: form.fullName.value.trim(),
-        phone: form.contactNumber.value.trim(),
-        email: form.email.value.trim(),
-        address: form.address.value.trim(),
-        bloodGroup: form.bloodGroup.value,
-        tagType: form.tagType.value,
-        emergencyContact: '',
-        note: ''
-      };
-
-      if (!payload.fullName || !payload.phone || !payload.email ||
-          !payload.address || !payload.bloodGroup || !payload.tagType) {
-        alert('Please fill in all the fields.');
-        return;
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Saving…';
-
-      try {
-        const res = await fetch('/api/leads', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('Server error');
-        const data = await res.json();
-        console.log('Saved lead ID:', data.id);
-
-        if (successMsg) successMsg.style.display = 'block';
-        submitBtn.textContent = '✓ Details saved';
-        submitBtn.style.background = '#2e7d32';
-        submitBtn.style.borderColor = '#2e7d32';
-        form.reset();
-      } catch (err) {
-        console.error(err);
-        alert('Could not save. Please try again.');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Create my BharatSafe ID ↗';
-      }
+      checkoutNotice.style.display = 'block';
+      checkoutNotice.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   });
   </script>

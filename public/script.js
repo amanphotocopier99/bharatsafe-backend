@@ -6,17 +6,29 @@ const typeData = {
 
 document.querySelectorAll('.selector-button').forEach((button) => {
   button.addEventListener('click', () => {
-    document.querySelectorAll('.selector-button').forEach((item) => item.classList.remove('active'));
+    document.querySelectorAll('.selector-button').forEach((item) => {
+      item.classList.remove('active');
+      item.setAttribute('aria-selected', 'false');
+    });
     button.classList.add('active');
+    button.setAttribute('aria-selected', 'true');
     const data = typeData[button.dataset.type];
-    document.querySelector('#preview-type').textContent = data.label;
-    document.querySelector('#preview-title').innerHTML = data.title;
+    const previewType = document.querySelector('#preview-type');
+    const previewTitle = document.querySelector('#preview-title');
+    const buyNowButton = document.querySelector('#buyNowButton');
+    if (previewType && previewTitle && data) {
+      previewType.textContent = data.label;
+      previewTitle.innerHTML = data.title;
+    }
+    if (buyNowButton && data) {
+      buyNowButton.href = `get-qr.html?type=${encodeURIComponent(button.dataset.type)}`;
+    }
   });
 });
 
 document.querySelectorAll('a[href^="#"]').forEach((link) => {
   link.addEventListener('click', (event) => {
-    const target = document.querySelector(link.getAttribute('href'));
+    const target = document.getElementById(link.hash.slice(1));
     if (!target) return;
     event.preventDefault();
     target.scrollIntoView({ behavior: 'smooth' });
