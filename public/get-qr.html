@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BharatSafe — Get your QR</title>
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="apple-touch-icon" href="/logo.png">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="glass-nav.css">
   <link rel="stylesheet" href="cursor.css">
@@ -17,8 +19,8 @@
     .form-group input, .form-group select { width: 100%; padding: .85rem 1rem; font-size: 1rem; border-radius: 16px; border: 1.5px solid #e2e2e2; background: #fafafa; transition: .2s; font-family: inherit; box-sizing: border-box; }
     .form-group input:focus, .form-group select:focus { outline: none; border-color: #1e1e1e; background: #fff; box-shadow: 0 0 0 4px rgba(0,0,0,.04); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-    @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; gap: 0; } .form-card { padding: 1.75rem 1.25rem; } .form-card h1 { font-size: 2rem; } }
-    .button-full { width: 100%; justify-content: center; padding: 1rem 1.5rem; font-size: 1rem; margin-top: .5rem; cursor: pointer; }
+    @media (max-width: 560px) { .form-wrap { padding: 1.25rem 1rem 3rem; } .form-row { grid-template-columns: 1fr; gap: 0; } .form-card { padding: 1.5rem 1.1rem; border-radius: 22px; } .form-card h1 { font-size: clamp(1.8rem, 9vw, 2.2rem); } .form-group input, .form-group select { min-height: 48px; } }
+    .button-full { width: 100%; min-height: 50px; justify-content: center; padding: 1rem 1.5rem; font-size: 1rem; margin-top: .5rem; cursor: pointer; }
     .back-link { display: inline-block; margin-top: 1.5rem; font-size: .95rem; color: #1e1e1e; text-decoration: none; border-bottom: 1px solid rgba(0,0,0,.2); padding-bottom: .1rem; }
     .checkout-notice { display: none; background: #fff6dd; border-radius: 16px; padding: 1.25rem; margin-top: 1.5rem; border-left: 5px solid #d39b18; }
     .checkout-notice p { margin: 0; color: #51400f; font-weight: 500; }

@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="BharatSafe smart emergency QR tags help people access your critical details when every second matters." />
   <title>BharatSafe — One scan. The right help.</title>
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/logo.png" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="glass-nav.css" />
   <link rel="stylesheet" href="cursor.css" />
@@ -38,7 +40,7 @@
         </div>
       </div>
 
-      <div class="hero-art reveal reveal-delay" aria-label="A BharatSafe QR sticker on a bike helmet">
+      <div class="hero-art reveal reveal-delay">
         <div class="sun-shape"></div>
         <div class="floating-note note-one">
           <span class="note-icon" aria-hidden="true">⌁</span>
@@ -48,19 +50,81 @@
           <span class="note-icon" aria-hidden="true">✓</span>
           <div><strong>Made for real life</strong><small>Emergency-ready</small></div>
         </div>
-        <div class="helmet">
-          <div class="helmet-shine"></div>
-          <div class="helmet-stripe"></div>
-          <div class="helmet-vent vent-one"></div>
-          <div class="helmet-vent vent-two"></div>
-          <div class="helmet-vent vent-three"></div>
-          <div class="sticker">
-            <div class="mini-brand">BS <span aria-hidden="true">+</span></div>
-            <div class="qr qr-small" aria-hidden="true"></div>
-            <strong>SCAN TO<br />GET ME HOME</strong>
+        <div class="hero-carousel" id="heroCarousel" role="region" aria-label="BharatSafe products" aria-roledescription="carousel">
+          <div class="hero-carousel-track">
+            <article class="hero-slide" role="group" aria-roledescription="slide" aria-label="1 of 5: Bike">
+              <div class="product-display">
+                <span class="product-icon" aria-hidden="true">🏍️</span>
+                <strong>BIKE</strong>
+                <span class="product-subtitle">A safer ride, one scan away</span>
+                <div class="product-qr">
+                  <div class="qr qr-small" aria-hidden="true"></div>
+                  <span>SCAN ME</span>
+                </div>
+              </div>
+            </article>
+            <article class="hero-slide" role="group" aria-roledescription="slide" aria-label="2 of 5: Car">
+              <div class="product-display">
+                <span class="product-icon" aria-hidden="true">🚗</span>
+                <strong>CAR</strong>
+                <span class="product-subtitle">Help for every journey</span>
+                <div class="product-qr">
+                  <div class="qr qr-small" aria-hidden="true"></div>
+                  <span>SCAN ME</span>
+                </div>
+              </div>
+            </article>
+            <article class="hero-slide" role="group" aria-roledescription="slide" aria-label="3 of 5: Luggage">
+              <div class="product-display">
+                <span class="product-icon" aria-hidden="true">🧳</span>
+                <strong>LUGGAGE</strong>
+                <span class="product-subtitle">Keep your travels connected</span>
+                <div class="product-qr">
+                  <div class="qr qr-small" aria-hidden="true"></div>
+                  <span>SCAN ME</span>
+                </div>
+              </div>
+            </article>
+            <article class="hero-slide" role="group" aria-roledescription="slide" aria-label="4 of 5: Pet">
+              <div class="product-display">
+                <span class="product-icon" aria-hidden="true">🐕</span>
+                <strong>PET</strong>
+                <span class="product-subtitle">A little help finding the way home</span>
+                <div class="product-qr">
+                  <div class="qr qr-small" aria-hidden="true"></div>
+                  <span>SCAN ME</span>
+                </div>
+              </div>
+            </article>
+            <article class="hero-slide hero-slide-helmet" role="group" aria-roledescription="slide" aria-label="5 of 5: Helmet with BharatSafe QR">
+              <div class="helmet">
+                <div class="helmet-shine"></div>
+                <div class="helmet-stripe"></div>
+                <div class="helmet-vent vent-one"></div>
+                <div class="helmet-vent vent-two"></div>
+                <div class="helmet-vent vent-three"></div>
+                <div class="sticker">
+                  <div class="mini-brand">BS <span aria-hidden="true">+</span></div>
+                  <div class="qr qr-small" aria-hidden="true"></div>
+                  <strong>SCAN TO<br />GET ME HOME</strong>
+                </div>
+              </div>
+            </article>
           </div>
         </div>
-        <div class="art-caption"><span>01</span><span>For the things<br />you take everywhere.</span></div>
+        <div class="hero-carousel-controls">
+          <button type="button" class="carousel-arrow" id="heroCarouselPrevious" aria-label="Previous product">‹</button>
+          <div class="carousel-dots" role="group" aria-label="Choose a product">
+            <button type="button" class="carousel-dot is-active" aria-label="Show Bike" aria-current="true"></button>
+            <button type="button" class="carousel-dot" aria-label="Show Car"></button>
+            <button type="button" class="carousel-dot" aria-label="Show Luggage"></button>
+            <button type="button" class="carousel-dot" aria-label="Show Pet"></button>
+            <button type="button" class="carousel-dot" aria-label="Show Helmet with QR"></button>
+          </div>
+          <button type="button" class="carousel-arrow" id="heroCarouselNext" aria-label="Next product">›</button>
+          <button type="button" class="carousel-pause" id="heroCarouselPause" aria-label="Pause product carousel">Ⅱ</button>
+        </div>
+        <div class="art-caption"><span id="heroCarouselCount">01 / 05</span><span>Safety for what<br />you take everywhere.</span></div>
       </div>
     </section>
 

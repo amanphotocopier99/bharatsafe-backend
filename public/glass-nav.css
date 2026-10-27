@@ -29,10 +29,11 @@
 
 @media (max-width: 800px) {
   .site-header {
+    width: calc(100% - 20px);
     height: auto;
     min-height: 58px;
     top: 10px;
-    margin-top: 10px;
+    margin: 10px auto 0;
     padding: 0 12px;
     border-radius: 16px;
     flex-wrap: wrap;
@@ -48,13 +49,55 @@
   .site-header .desktop-nav {
     order: 3;
     flex: 1 0 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px 16px;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 8px 2px 10px;
     font-size: 12px;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .site-header .site-nav::-webkit-scrollbar,
+  .site-header .desktop-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-header .site-nav a,
+  .site-header .desktop-nav a {
+    flex: 0 0 auto;
   }
 
   .site-header .header-cta {
     margin-left: auto;
+    min-height: 40px;
+  }
+
+  .site-header .admin-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .site-header {
+    gap: 4px 10px;
+    padding: 0 9px;
+  }
+
+  .site-header .brand img {
+    width: 112px;
+    height: 38px;
+  }
+
+  .site-header .header-cta {
+    padding: 6px 9px;
+    font-size: 12px;
+  }
+
+  .site-header .site-nav,
+  .site-header .desktop-nav {
+    gap: 16px;
   }
 }
