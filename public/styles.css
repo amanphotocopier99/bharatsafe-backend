@@ -288,9 +288,6 @@
   display: block;
   width: 260px;
   height: 100px;
-  padding: 8px;
-  border-radius: 4px;
-  background: var(--paper);
   object-fit: cover;
   object-position: center;
   max-width: 100%;
@@ -364,7 +361,6 @@
 
   .footer-logo {
     height: 84px;
-    padding: 6px;
   }
 
   .footer-text-section {

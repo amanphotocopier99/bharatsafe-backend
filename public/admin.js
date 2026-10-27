@@ -733,10 +733,14 @@ function saveProducts(products) {
   function showLogin() {
     if (loginBox)  loginBox.style.display = 'block';
     if (leadsSect) leadsSect.style.display = 'none';
+    const adminShell = document.querySelector('.admin-shell');
+    if (adminShell) adminShell.style.display = 'none';
   }
   function showLeads() {
     if (loginBox)  loginBox.style.display = 'none';
     if (leadsSect) leadsSect.style.display = 'block';
+    const adminShell = document.querySelector('.admin-shell');
+    if (adminShell) adminShell.style.display = 'block';
   }
 
   async function doLogin() {
@@ -763,6 +767,9 @@ function saveProducts(products) {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
+        if (res.status === 404) {
+          throw new Error('Admin API not found. Open this page from the BharatSafe backend server, not a static preview.');
+        }
         throw new Error(err.error || 'Invalid credentials');
       }
       const { token } = await res.json();
@@ -770,7 +777,9 @@ function saveProducts(products) {
       passInput.value = '';
       await loadLeads();
     } catch (err) {
-      loginErr.textContent = err.message || 'Login failed.';
+      loginErr.textContent = err instanceof TypeError
+        ? 'Cannot reach the BharatSafe server. Start the backend and open this page from its address.'
+        : err.message || 'Login failed.';
       loginErr.style.display = 'block';
     } finally {
       loginBtn.disabled = false;
@@ -786,19 +795,25 @@ function saveProducts(products) {
       const res = await fetch('/api/leads', {
         headers: { Authorization: 'Bearer ' + token }
       });
-      if (res.status === 401) {
+      if (res.status === 401 || res.status === 403) {
         localStorage.removeItem(TOKEN_KEY);
         showLogin();
         return;
       }
-      if (!res.ok) throw new Error('Failed to load leads');
+      if (res.status === 404) {
+        throw new Error('Admin API not found. Open this page from the BharatSafe backend server, not a static preview.');
+      }
+      if (!res.ok) throw new Error(`Could not load admin data (HTTP ${res.status}).`);
       leads = await res.json();
       render();
       showLeads();
     } catch (err) {
       console.error(err);
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#f87171;padding:24px;">Could not load leads. Check console.</td></tr>`;
-      showLeads();
+      showLogin();
+      loginErr.textContent = err instanceof TypeError
+        ? 'Cannot reach the BharatSafe server. Start the backend and open this page from its address.'
+        : err.message || 'Could not load admin data.';
+      loginErr.style.display = 'block';
     }
   }
 

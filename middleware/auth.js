@@ -6,7 +6,11 @@ module.exports = function requireAuth(req, res, next) {
   if (!token) return res.status(401).json({ error: 'No token' });
 
   try {
-    req.admin = jwt.verify(token, process.env.JWT_SECRET);
+    const admin = jwt.verify(token, process.env.JWT_SECRET);
+    if (admin.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    req.admin = admin;
     next();
   } catch {
     return res.status(401).json({ error: 'Invalid or expired token' });

@@ -10,7 +10,7 @@ function renderPosts() {
   const posts = getPosts().filter((post) => post.published);
   const grid = document.querySelector('#post-grid');
   document.querySelector('#post-count').textContent = `${posts.length} ${posts.length === 1 ? 'story' : 'stories'}`;
-  if (!posts.length) { grid.innerHTML = '<div class="empty-posts"><h2>Stories are on their way.</h2><p>Open the admin panel to publish the first one.</p><a class="button button-dark" href="admin.html">Write a story <span>↗</span></a></div>'; return; }
+  if (!posts.length) { grid.innerHTML = '<div class="empty-posts"><h2>Stories are on their way.</h2><p>Check back soon for new stories.</p></div>'; return; }
   grid.innerHTML = posts.map((post, index) => `<article class="post-card ${index === 0 ? 'featured-post' : ''}"><div class="post-art post-art-${index % 3}"><span>${String(index + 1).padStart(2, '0')}</span><strong>${post.category}</strong></div><div class="post-meta"><span>${post.category}</span><span>${formatDate(post.date)}</span></div><h2>${post.title}</h2><p>${post.excerpt}</p><details><summary>Read story <span>↗</span></summary><div class="story-content">${post.content.split('\n').map((line) => `<p>${line}</p>`).join('')}</div></details></article>`).join('');
 }
 renderPosts();

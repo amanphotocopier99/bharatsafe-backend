@@ -136,7 +136,26 @@
     <a class="header-cta" href="get-qr.html">Buy now <span aria-hidden="true">↗</span></a>
   </header>
 
-  <main class="admin-shell">
+  <div id="admin-login-box" style="max-width:420px;margin:40px auto;padding:32px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:16px;">
+    <h2 style="margin-top:0;">Admin login</h2>
+    <p style="opacity:.7;font-size:.9rem;margin-bottom:20px;">Sign in to open the admin dashboard.</p>
+    <label style="display:block;margin-bottom:12px;">
+      <span style="display:block;font-size:.85rem;opacity:.7;margin-bottom:6px;">Username</span>
+      <input id="admin-username" type="text" autocomplete="username"
+             style="width:100%;padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:inherit;font-size:1rem;" />
+    </label>
+    <label style="display:block;margin-bottom:20px;">
+      <span style="display:block;font-size:.85rem;opacity:.7;margin-bottom:6px;">Password</span>
+      <input id="admin-password" type="password" autocomplete="current-password"
+             style="width:100%;padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:inherit;font-size:1rem;" />
+    </label>
+    <button id="admin-login-btn" class="button button-dark" type="button" style="width:100%;">
+      Sign in <span aria-hidden="true">↗</span>
+    </button>
+    <p id="admin-login-error" style="color:#f87171;font-size:.85rem;margin-top:12px;display:none;"></p>
+  </div>
+
+  <main class="admin-shell" style="display:none;">
     <div class="admin-heading">
       <div>
         <p class="eyebrow"><span class="eyebrow-dot"></span> Central control panel</p>
@@ -289,26 +308,6 @@
     <!-- ==================== TAB 3: FORM SUBMISSIONS ==================== -->
 <div id="tab-leads" class="admin-tab-view">
 
-  <!-- Login form (shown when not logged in) -->
-  <div id="admin-login-box" style="max-width:420px;margin:40px auto;padding:32px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:16px;">
-    <h2 style="margin-top:0;">Admin login</h2>
-    <p style="opacity:.7;font-size:.9rem;margin-bottom:20px;">Sign in to view form submissions.</p>
-    <label style="display:block;margin-bottom:12px;">
-      <span style="display:block;font-size:.85rem;opacity:.7;margin-bottom:6px;">Username</span>
-      <input id="admin-username" type="text" autocomplete="username"
-             style="width:100%;padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:inherit;font-size:1rem;" />
-    </label>
-    <label style="display:block;margin-bottom:20px;">
-      <span style="display:block;font-size:.85rem;opacity:.7;margin-bottom:6px;">Password</span>
-      <input id="admin-password" type="password" autocomplete="current-password"
-             style="width:100%;padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:inherit;font-size:1rem;" />
-    </label>
-    <button id="admin-login-btn" class="button button-dark" type="button" style="width:100%;">
-      Sign in <span aria-hidden="true">↗</span>
-    </button>
-    <p id="admin-login-error" style="color:#f87171;font-size:.85rem;margin-top:12px;display:none;"></p>
-  </div>
-
   <!-- Leads table (shown after login) -->
   <section id="admin-leads-section" class="posts-manager" style="display:none;">
     <div class="panel-heading">
@@ -352,7 +351,6 @@
           <a href="index.html#faq">FAQ</a>
           <a href="about-us.html#privacy">Privacy</a>
           <a href="blog.html">Journal</a>
-          <a href="admin.html">Admin</a>
           <a href="get-qr.html">Buy now</a>
         </nav>
         <div class="footer-bottom">
