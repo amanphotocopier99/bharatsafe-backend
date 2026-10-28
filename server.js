@@ -28,16 +28,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 // API routes
 app.use('/api', require('./routes/auth'));
 app.use('/api/leads', require('./routes/leads'));
+app.use('/api/payments', require('./routes/payments'));
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 // SPA fallback — do NOT swallow file or API requests
-app.get('*', (req, res) => {
+app.get(/.*/, (req, res) => {
   if (req.path.startsWith('/api') || path.extname(req.path)) {
     return res.status(404).send('Not found');
   }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`BharatSafe backend running on http://localhost:${PORT}`);

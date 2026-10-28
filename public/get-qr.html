@@ -23,8 +23,12 @@
     .button-full { width: 100%; min-height: 50px; justify-content: center; padding: 1rem 1.5rem; font-size: 1rem; margin-top: .5rem; cursor: pointer; }
     .back-link { display: inline-block; margin-top: 1.5rem; font-size: .95rem; color: #1e1e1e; text-decoration: none; border-bottom: 1px solid rgba(0,0,0,.2); padding-bottom: .1rem; }
     .checkout-notice { display: none; background: #fff6dd; border-radius: 16px; padding: 1.25rem; margin-top: 1.5rem; border-left: 5px solid #d39b18; }
+    .checkout-notice[data-state="success"] { background: #eaf5ec; border-color: #327442; }
     .checkout-notice p { margin: 0; color: #51400f; font-weight: 500; }
+    .checkout-notice[data-state="success"] p { color: #245c32; }
     .checkout-notice small { display: block; margin-top: .5rem; color: #66551f; }
+    .checkout-notice button { margin-top: 1rem; border: 0; border-radius: 10px; padding: .75rem 1rem; background: #1e1e1e; color: #fff; cursor: pointer; }
+    .checkout-privacy { margin: 1rem 0 0; color: #665f58; font-size: .82rem; }
   </style>
 </head>
 <body>
@@ -91,9 +95,13 @@
           </button>
         </form>
 
-        <div class="checkout-notice" id="checkoutNotice" role="status" aria-live="polite">
-          <p>Online payment is not available yet.</p>
-          <small>Your details have not been submitted, and no order or payment has been created. Please try again after checkout is set up.</small>
+        <p class="checkout-privacy">Your details will be used to process and deliver your order. Your name, phone number, and email address are shared with Cashfree to create the payment.</p>
+
+        <div class="checkout-notice" id="checkoutNotice" role="status" aria-live="polite" data-state="info">
+          <p id="checkoutMessage"></p>
+          <small id="checkoutDetails"></small>
+          <button type="button" id="checkPaymentBtn" hidden>Check payment status</button>
+          <button type="button" id="retryPaymentBtn" hidden>Continue to payment</button>
         </div>
 
         <a href="index.html" class="back-link">← Back to home</a>
@@ -123,24 +131,133 @@
   </footer>
 
   <script src="cursor.js"></script>
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('qrDetailsForm');
     const checkoutNotice = document.getElementById('checkoutNotice');
+    const checkoutMessage = document.getElementById('checkoutMessage');
+    const checkoutDetails = document.getElementById('checkoutDetails');
     const tagSelect = document.getElementById('tagType');
+    const submitButton = document.getElementById('submitBtn');
+    const checkPaymentButton = document.getElementById('checkPaymentBtn');
+    const retryPaymentButton = document.getElementById('retryPaymentBtn');
 
-    if (!form || !checkoutNotice || !tagSelect) return;
+    if (!form || !checkoutNotice || !checkoutMessage || !checkoutDetails || !tagSelect || !submitButton) return;
 
     const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('order_id');
     const preselectedType = urlParams.get('type');
     if (preselectedType && ['bike', 'car', 'luggage'].includes(preselectedType)) {
       tagSelect.value = preselectedType;
     }
 
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
+    function showNotice(message, details, state) {
+      checkoutMessage.textContent = message;
+      checkoutDetails.textContent = details || '';
+      checkoutNotice.dataset.state = state || 'info';
       checkoutNotice.style.display = 'block';
-      checkoutNotice.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function openCheckout(paymentSessionId, mode) {
+      if (typeof window.Cashfree !== 'function') {
+        throw new Error('Payment checkout could not be loaded. Please try again.');
+      }
+
+      const cashfree = window.Cashfree({ mode });
+      const result = await cashfree.checkout({
+        paymentSessionId,
+        redirectTarget: '_self'
+      });
+
+      if (result && result.error) {
+        throw new Error('Payment was not completed. You can try again.');
+      }
+    }
+
+    async function checkPaymentStatus(id) {
+      checkPaymentButton.hidden = true;
+      retryPaymentButton.hidden = true;
+      checkPaymentButton.disabled = true;
+      showNotice('Checking your payment…', 'Please wait while we confirm the status with Cashfree.', 'info');
+
+      try {
+        const response = await fetch(`/api/payments/orders/${encodeURIComponent(id)}`);
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'Could not check payment status.');
+        }
+
+        form.hidden = true;
+        if (result.status === 'PAID') {
+          showNotice('Payment received. Your order is confirmed.', `Order ${result.orderId} · ${result.tagType} tag · ₹${result.amount}`, 'success');
+          return;
+        }
+
+        if (result.status === 'ACTIVE' && result.paymentSessionId) {
+          showNotice('Payment is not confirmed yet.', 'Complete payment or check the status again in a moment.', 'info');
+          retryPaymentButton.hidden = false;
+          retryPaymentButton.onclick = async function () {
+            retryPaymentButton.disabled = true;
+            try {
+              await openCheckout(result.paymentSessionId, result.checkoutMode);
+            } catch (error) {
+              showNotice(error.message, 'Your order is still available. You can retry payment.', 'info');
+            } finally {
+              retryPaymentButton.disabled = false;
+            }
+          };
+          return;
+        }
+
+        showNotice(`Payment status: ${result.status}.`, 'If you completed payment, check the status again shortly.', 'info');
+        checkPaymentButton.hidden = false;
+      } catch (error) {
+        showNotice(error.message || 'Could not check payment status.', 'Please try checking again.', 'info');
+        checkPaymentButton.hidden = false;
+      } finally {
+        checkPaymentButton.disabled = false;
+      }
+    }
+
+    checkPaymentButton.addEventListener('click', function () {
+      if (orderId) checkPaymentStatus(orderId);
+    });
+
+    if (orderId) {
+      form.hidden = true;
+      checkPaymentStatus(orderId);
+      return;
+    }
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      submitButton.disabled = true;
+      showNotice('Preparing secure checkout…', 'Your details are sent securely to create your order.', 'info');
+
+      try {
+        const response = await fetch('/api/payments/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName: document.getElementById('fullName').value,
+            contactNumber: document.getElementById('contactNumber').value,
+            email: document.getElementById('email').value,
+            address: document.getElementById('address').value,
+            tagType: tagSelect.value
+          })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'Could not start payment. Please try again.');
+        }
+
+        await openCheckout(result.paymentSessionId, result.checkoutMode);
+      } catch (error) {
+        showNotice(error.message || 'Could not start payment. Please try again.', '', 'info');
+      } finally {
+        submitButton.disabled = false;
+      }
     });
   });
   </script>
