@@ -28,7 +28,6 @@
     .checkout-notice[data-state="success"] p { color: #245c32; }
     .checkout-notice small { display: block; margin-top: .5rem; color: #66551f; }
     .checkout-notice button { margin-top: 1rem; border: 0; border-radius: 10px; padding: .75rem 1rem; background: #1e1e1e; color: #fff; cursor: pointer; }
-    .checkout-privacy { margin: 1rem 0 0; color: #665f58; font-size: .82rem; }
   </style>
 </head>
 <body>
@@ -80,6 +79,27 @@
             <input type="text" id="address" name="address" autocomplete="street-address" placeholder="Street, city, state, PIN code" required>
           </div>
 
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bloodGroup">Blood group</label>
+              <select id="bloodGroup" name="bloodGroup" required>
+                <option value="" disabled selected>Select blood group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="emergencyContact">Emergency contact <span>(optional)</span></label>
+              <input type="tel" id="emergencyContact" name="emergencyContact" autocomplete="tel" placeholder="+91 98765 43210">
+            </div>
+          </div>
+
           <div class="form-group">
             <label for="tagType">Product</label>
             <select id="tagType" name="tagType" required>
@@ -94,8 +114,6 @@
             Continue to payment <span aria-hidden="true">↗</span>
           </button>
         </form>
-
-        <p class="checkout-privacy">Your details will be used to process and deliver your order. Your name, phone number, and email address are shared with Cashfree to create the payment.</p>
 
         <div class="checkout-notice" id="checkoutNotice" role="status" aria-live="polite" data-state="info">
           <p id="checkoutMessage"></p>
@@ -244,6 +262,8 @@
             contactNumber: document.getElementById('contactNumber').value,
             email: document.getElementById('email').value,
             address: document.getElementById('address').value,
+            bloodGroup: document.getElementById('bloodGroup').value,
+            emergencyContact: document.getElementById('emergencyContact').value,
             tagType: tagSelect.value
           })
         });

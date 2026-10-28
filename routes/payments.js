@@ -91,24 +91,37 @@ function getCustomerDetails(body) {
   const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
   const address = typeof body.address === 'string' ? body.address.trim() : '';
   const contactNumber = typeof body.contactNumber === 'string' ? body.contactNumber.trim() : '';
+  const emergencyContactNumber = typeof body.emergencyContact === 'string'
+    ? body.emergencyContact.trim()
+    : '';
+  const bloodGroup = body.bloodGroup;
   const tagType = body.tagType;
-  const digits = contactNumber.replace(/\D/g, '');
-  const phone = digits.length === 12 && digits.startsWith('91') ? digits.slice(2) : digits;
+  const normalizePhone = (value) => {
+    const digits = value.replace(/\D/g, '');
+    const phone = digits.length === 12 && digits.startsWith('91') ? digits.slice(2) : digits;
+    return /^[6-9]\d{9}$/.test(phone) ? phone : null;
+  };
+  const phone = normalizePhone(contactNumber);
+  const emergencyContact = emergencyContactNumber
+    ? normalizePhone(emergencyContactNumber)
+    : null;
 
   if (
     !fullName ||
     fullName.length > 100 ||
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
     email.length > 254 ||
-    !/^[6-9]\d{9}$/.test(phone) ||
+    !phone ||
     !address ||
     address.length > 500 ||
+    !['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].includes(bloodGroup) ||
+    (emergencyContactNumber && !emergencyContact) ||
     !Object.prototype.hasOwnProperty.call(PRODUCTS, tagType)
   ) {
     return null;
   }
 
-  return { fullName, email, phone, address, tagType };
+  return { fullName, email, phone, address, bloodGroup, emergencyContact, tagType };
 }
 
 router.post('/orders', async (req, res) => {
@@ -131,6 +144,8 @@ router.post('/orders', async (req, res) => {
       phone: customer.phone,
       email: customer.email,
       address: customer.address,
+      blood_group: customer.bloodGroup,
+      emergency_contact: customer.emergencyContact,
       tag_type: customer.tagType,
       amount: PRICE_INR,
       currency: 'INR',
