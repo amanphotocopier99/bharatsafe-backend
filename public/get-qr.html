@@ -28,9 +28,6 @@
     .checkout-notice[data-state="success"] p { color: #245c32; }
     .checkout-notice small { display: block; margin-top: .5rem; color: #66551f; }
     .checkout-notice button { margin-top: 1rem; border: 0; border-radius: 10px; padding: .75rem 1rem; background: #1e1e1e; color: #fff; cursor: pointer; }
-    .tag-qr-download { display: inline-flex; align-items: center; gap: 1rem; margin-top: 1rem; color: #1e1e1e; font-weight: 600; }
-    .tag-qr-download img { width: 120px; height: 120px; background: #fff; }
-    .tag-serial { display: block; }
   </style>
 </head>
 <body>
@@ -121,11 +118,6 @@
         <div class="checkout-notice" id="checkoutNotice" role="status" aria-live="polite" data-state="info">
           <p id="checkoutMessage"></p>
           <small id="checkoutDetails"></small>
-          <strong id="tagSerial" class="tag-serial" hidden></strong>
-          <a id="tagQrDownload" class="tag-qr-download" hidden>
-            <img id="tagQrImage" alt="Your BharatSafe scan QR code">
-            <span>Download your QR code</span>
-          </a>
           <button type="button" id="checkPaymentBtn" hidden>Check payment status</button>
           <button type="button" id="retryPaymentBtn" hidden>Continue to payment</button>
         </div>
@@ -168,9 +160,6 @@
     const submitButton = document.getElementById('submitBtn');
     const checkPaymentButton = document.getElementById('checkPaymentBtn');
     const retryPaymentButton = document.getElementById('retryPaymentBtn');
-    const tagSerial = document.getElementById('tagSerial');
-    const tagQrDownload = document.getElementById('tagQrDownload');
-    const tagQrImage = document.getElementById('tagQrImage');
 
     if (!form || !checkoutNotice || !checkoutMessage || !checkoutDetails || !tagSelect || !submitButton) return;
 
@@ -221,15 +210,6 @@
         if (result.status === 'PAID') {
           const orderDetails = `Order ${result.orderId} · ${result.tagType} tag · ₹${result.amount}`;
           showNotice('Payment received. Your order is confirmed.', orderDetails, 'success');
-          if (result.tag && result.tag.qrCode && result.tag.serialId) {
-            tagSerial.textContent = `Tag serial: ${result.tag.serialId}`;
-            tagSerial.hidden = false;
-            tagQrImage.src = result.tag.qrCode;
-            tagQrDownload.href = result.tag.qrCode;
-            tagQrDownload.download = `BharatSafe-${result.tag.serialId}.png`;
-            tagQrDownload.hidden = false;
-            checkoutDetails.textContent = `${orderDetails} · ${result.tag.scanUrl}`;
-          }
           return;
         }
 

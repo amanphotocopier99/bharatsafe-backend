@@ -313,13 +313,7 @@ router.get('/orders/:orderId', async (req, res) => {
     };
 
     if (order.status === 'PAID') {
-      const tag = await issueTag(order);
-      const qr = await getTagQr(config, tag);
-      result.tag = {
-        serialId: tag.serial_id,
-        scanUrl: qr.scanUrl,
-        qrCode: qr.qrCode
-      };
+      await issueTag(order);
     }
 
     return res.json(result);
