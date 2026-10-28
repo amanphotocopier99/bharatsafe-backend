@@ -57,6 +57,12 @@ function updateHeaderStats(activeTab) {
     primaryStatLabel.textContent = "Submissions";
     secondaryStatCount.textContent = leads.filter((l) => l.status === "New").length;
     secondaryStatLabel.textContent = "Pending (New)";
+  } else if (activeTab === "tab-customer-tags") {
+    viewTitle.innerHTML = "Customer<br /><em>QR tags.</em>";
+    primaryStatCount.textContent = "—";
+    primaryStatLabel.textContent = "Paid orders";
+    secondaryStatCount.textContent = "—";
+    secondaryStatLabel.textContent = "Issued tags";
   }
 }
 

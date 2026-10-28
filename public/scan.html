@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>BharatSafe — Emergency profile</title>
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/glass-nav.css">
+  <style>
+    .scan-wrap { max-width: 620px; margin: 0 auto; padding: 2rem 1rem 5rem; }
+    .scan-card { background: #fff; border: 1px solid rgba(0,0,0,.06); border-radius: 24px; padding: 2rem; box-shadow: 0 16px 40px -24px rgba(0,0,0,.24); }
+    .scan-card h1 { margin: .75rem 0 1.5rem; font-size: clamp(2rem, 8vw, 3rem); }
+    .scan-blood { display: flex; align-items: center; gap: 1rem; margin: 1.25rem 0; padding: 1rem; border-radius: 16px; background: #fff0ef; }
+    .scan-blood strong { color: #c62828; font: 600 2.25rem 'Space Grotesk', sans-serif; }
+    .scan-blood span { color: #554; }
+    .scan-contact { display: grid; gap: .75rem; margin-top: 1.5rem; }
+    .scan-contact a { display: block; padding: 1rem; border-radius: 12px; background: #151414; color: #fff; font-weight: 600; text-align: center; }
+    .scan-contact a.secondary { background: #f0eee8; color: #151414; }
+    .scan-meta { color: #77736d; font-size: .9rem; }
+    .scan-error { color: #6b2925; background: #fff0ef; border-radius: 14px; padding: 1rem; }
+    [hidden] { display: none !important; }
+    @media (max-width: 560px) { .scan-card { padding: 1.4rem; border-radius: 18px; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="BharatSafe home"><img src="/logo.png" alt="BharatSafe"></a>
+    <a class="header-cta" href="/">BharatSafe <span aria-hidden="true">↗</span></a>
+  </header>
+  <main class="scan-wrap">
+    <section class="scan-card" id="profile" hidden aria-live="polite">
+      <p class="eyebrow"><span class="eyebrow-dot"></span> BharatSafe emergency profile</p>
+      <h1 id="profileName"></h1>
+      <p class="scan-meta" id="profileTag"></p>
+      <div class="scan-blood">
+        <strong id="profileBlood"></strong>
+        <span>Blood group</span>
+      </div>
+      <div class="scan-contact" id="profileContacts"></div>
+      <p class="scan-meta">Tag <span id="profileSerial"></span> · If this is an emergency, call 112.</p>
+    </section>
+    <section class="scan-card" id="loading" role="status">Loading emergency profile…</section>
+    <section class="scan-card scan-error" id="error" hidden role="alert"></section>
+  </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', async function () {
+      const loading = document.getElementById('loading');
+      const error = document.getElementById('error');
+      const profile = document.getElementById('profile');
+      const scanCode = window.location.pathname.split('/').filter(Boolean).pop();
+
+      try {
+        const response = await fetch('/api/tags/' + encodeURIComponent(scanCode));
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'This BharatSafe tag is not active.');
+
+        document.getElementById('profileName').textContent = data.name;
+        document.getElementById('profileTag').textContent = data.tagType + ' safety tag';
+        document.getElementById('profileBlood').textContent = data.bloodGroup;
+        document.getElementById('profileSerial').textContent = data.serialId;
+
+        const contacts = document.getElementById('profileContacts');
+        const primaryLink = document.createElement('a');
+        primaryLink.href = 'tel:' + data.phone;
+        primaryLink.textContent = 'Call ' + data.name;
+        contacts.appendChild(primaryLink);
+
+        if (data.emergencyContact) {
+          const emergencyLink = document.createElement('a');
+          emergencyLink.className = 'secondary';
+          emergencyLink.href = 'tel:' + data.emergencyContact;
+          emergencyLink.textContent = 'Call emergency contact';
+          contacts.appendChild(emergencyLink);
+        }
+
+        loading.hidden = true;
+        profile.hidden = false;
+      } catch (loadError) {
+        loading.hidden = true;
+        error.textContent = loadError.message || 'Could not load this emergency profile.';
+        error.hidden = false;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -173,6 +173,7 @@
     <nav class="admin-nav-tabs" aria-label="Portal sections">
       <button class="admin-tab-btn active" data-tab="tab-journal">Stories & Journal</button>
       <button class="admin-tab-btn" data-tab="tab-products">Products & Tags</button>
+      <button class="admin-tab-btn" data-tab="tab-customer-tags">Customer QR Tags</button>
       <button class="admin-tab-btn" data-tab="tab-leads">Form Submissions</button>
     </nav>
 
@@ -306,6 +307,40 @@
       </section>
     </div>
 
+    <div id="tab-customer-tags" class="admin-tab-view">
+      <section class="posts-manager">
+        <div class="panel-heading">
+          <div>
+            <h2>Paid customer tags</h2>
+            <p style="color:var(--muted);max-width:680px;">Each paid order receives a unique serial number and QR code. Download the QR and attach it to the matching customer tag.</p>
+          </div>
+          <button id="refresh-customer-tags" class="btn-sm-action" type="button">Refresh tags</button>
+        </div>
+        <p id="customer-tags-message" class="form-message" role="status"></p>
+        <div class="admin-table-container">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Serial / QR</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Blood group</th>
+                <th>Scan profile</th>
+                <th>Tag status</th>
+              </tr>
+            </thead>
+            <tbody id="customer-tags-body">
+              <tr><td colspan="6" style="text-align:center;opacity:.6;padding:24px;">Open this tab to load paid customer tags.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="action-btn-group" style="justify-content:flex-end;margin-top:16px;">
+          <button id="customer-tags-previous" class="btn-sm-action" type="button" disabled>Previous</button>
+          <button id="customer-tags-next" class="btn-sm-action" type="button" disabled>Next</button>
+        </div>
+      </section>
+    </div>
+
     <!-- ==================== TAB 3: FORM SUBMISSIONS ==================== -->
     <!-- ==================== TAB 3: FORM SUBMISSIONS ==================== -->
 <div id="tab-leads" class="admin-tab-view">
@@ -364,5 +399,6 @@
 
   <script src="cursor.js"></script>
   <script src="admin.js"></script>
+  <script src="admin-tags.js"></script>
 </body>
 </html>

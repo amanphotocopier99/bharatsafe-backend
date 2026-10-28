@@ -1,6 +1,10 @@
 const crypto = require('crypto');
 const express = require('express');
+const QRCode = require('qrcode');
+const requireAuth = require('../middleware/auth');
 const PaymentOrder = require('../models/PaymentOrder');
+const Tag = require('../models/Tag');
+const TagCounter = require('../models/TagCounter');
 
 const router = express.Router();
 const API_VERSION = '2025-01-01';
@@ -10,6 +14,7 @@ const PRODUCTS = {
   luggage: 'Luggage'
 };
 const PRICE_INR = 149;
+const TAG_COUNTER_ID = 'customer-tag';
 
 class CashfreeRequestError extends Error {
   constructor(status) {
@@ -84,6 +89,56 @@ async function cashfreeRequest(config, pathname, options = {}) {
   }
 
   return result;
+}
+
+async function issueTag(order) {
+  const existing = await Tag.findOne({ payment_order: order._id }).select('+scan_code');
+  if (existing) return existing;
+
+  let counter;
+  try {
+    counter = await TagCounter.findByIdAndUpdate(
+      TAG_COUNTER_ID,
+      { $inc: { sequence: 1 } },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+  } catch (error) {
+    if (error.code !== 11000) throw error;
+    counter = await TagCounter.findByIdAndUpdate(
+      TAG_COUNTER_ID,
+      { $inc: { sequence: 1 } },
+      { new: true }
+    );
+    if (!counter) throw error;
+  }
+  const serialId = `BS-${String(counter.sequence).padStart(6, '0')}`;
+
+  try {
+    return await Tag.create({
+      payment_order: order._id,
+      serial_id: serialId,
+      scan_code: crypto.randomBytes(32).toString('hex')
+    });
+  } catch (error) {
+    if (error.code !== 11000) throw error;
+    const tag = await Tag.findOne({ payment_order: order._id }).select('+scan_code');
+    if (!tag) throw error;
+    return tag;
+  }
+}
+
+function getScanUrl(config, scanCode) {
+  return new URL(`/s/${scanCode}`, config.appUrl).toString();
+}
+
+async function getTagQr(config, tag) {
+  const scanUrl = getScanUrl(config, tag.scan_code);
+  const qrCode = await QRCode.toDataURL(scanUrl, {
+    errorCorrectionLevel: 'H',
+    margin: 2,
+    width: 256
+  });
+  return { scanUrl, qrCode };
 }
 
 function getCustomerDetails(body) {
@@ -248,20 +303,102 @@ router.get('/orders/:orderId', async (req, res) => {
     order.status = gatewayOrder.order_status || order.status;
     await order.save();
 
-    return res.json({
+    const result = {
       orderId,
       status: order.status,
       tagType: order.tag_type,
       amount: order.amount,
       paymentSessionId: order.status === 'ACTIVE' ? order.payment_session_id : undefined,
       checkoutMode: config.mode
-    });
+    };
+
+    if (order.status === 'PAID') {
+      const tag = await issueTag(order);
+      const qr = await getTagQr(config, tag);
+      result.tag = {
+        serialId: tag.serial_id,
+        scanUrl: qr.scanUrl,
+        qrCode: qr.qrCode
+      };
+    }
+
+    return res.json(result);
   } catch (error) {
     console.error(
       'Cashfree payment verification failed:',
       error instanceof CashfreeRequestError ? `HTTP ${error.status}` : error.message
     );
     return res.status(502).json({ error: 'Could not check payment status. Please try again.' });
+  }
+});
+
+router.get('/tags', requireAuth, async (req, res) => {
+  const config = getCashfreeConfig();
+  if (!config) {
+    return res.status(503).json({ error: 'Payment gateway is not configured' });
+  }
+
+  const requestedLimit = Number.parseInt(req.query.limit, 10);
+  const requestedSkip = Number.parseInt(req.query.skip, 10);
+  const limit = Number.isInteger(requestedLimit) && requestedLimit > 0
+    ? Math.min(requestedLimit, 50)
+    : 25;
+  const skip = Number.isInteger(requestedSkip) && requestedSkip >= 0
+    ? Math.min(requestedSkip, 100000)
+    : 0;
+
+  try {
+    const orders = await PaymentOrder.find({ status: 'PAID' })
+      .sort({ created_at: -1, _id: -1 })
+      .skip(skip)
+      .limit(limit + 1);
+    const hasMore = orders.length > limit;
+    const pageOrders = orders.slice(0, limit);
+    const tags = await Promise.all(pageOrders.map(async (order) => {
+      const tag = await issueTag(order);
+      const qr = await getTagQr(config, tag);
+      return {
+        serialId: tag.serial_id,
+        scanUrl: qr.scanUrl,
+        qrCode: qr.qrCode,
+        active: tag.active,
+        name: order.full_name,
+        phone: order.phone,
+        address: order.address,
+        tagType: order.tag_type,
+        bloodGroup: order.blood_group,
+        createdAt: tag.created_at
+      };
+    }));
+
+    return res.json({
+      tags,
+      hasMore,
+      nextSkip: skip + pageOrders.length
+    });
+  } catch (error) {
+    console.error('Issued tag list failed:', error.message);
+    return res.status(500).json({ error: 'Could not load issued tags' });
+  }
+});
+
+router.patch('/tags/:serialId', requireAuth, async (req, res) => {
+  const { serialId } = req.params;
+  if (!/^BS-\d{6,}$/.test(serialId) || typeof req.body?.active !== 'boolean') {
+    return res.status(400).json({ error: 'Invalid tag update' });
+  }
+
+  try {
+    const tag = await Tag.findOneAndUpdate(
+      { serial_id: serialId },
+      { active: req.body.active },
+      { new: true }
+    );
+    if (!tag) return res.status(404).json({ error: 'Tag not found' });
+    return res.json({ serialId: tag.serial_id, active: tag.active });
+  } catch (error) {
+    console.error('Tag update failed:', error.message);
+    return res.status(500).json({ error: 'Could not update tag' });
   }
 });
 

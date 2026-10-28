@@ -29,7 +29,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', require('./routes/auth'));
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/tags', require('./routes/tags'));
 app.get('/api/health', (req, res) => res.json({ ok: true }));
+
+app.get('/s/:scanCode', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'scan.html'));
+});
 
 // SPA fallback — do NOT swallow file or API requests
 app.get(/.*/, (req, res) => {
