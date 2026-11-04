@@ -191,7 +191,14 @@
       if (!product) return;
 
       productTitle.textContent = product.title;
-      window.renderBharatSafeProductDescription(productDescription, product);
+      productDescription.replaceChildren();
+      const summary = document.createElement('p');
+      summary.textContent = product.shortDescription;
+      productDescription.append(summary);
+      const detailsLink = document.createElement('a');
+      detailsLink.href = `product.html?type=${encodeURIComponent(tagSelect.value)}`;
+      detailsLink.textContent = 'View full product details';
+      productDescription.append(detailsLink);
     }
 
     tagSelect.addEventListener('change', updateProductDetails);

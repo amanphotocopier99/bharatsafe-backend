@@ -1,28 +1,7 @@
 const typeData = {
-  bike: {
-    label: 'BIKE',
-    title: window.BHARATSAFE_PRODUCTS.bike.title,
-    description: window.BHARATSAFE_PRODUCTS.bike,
-    image: '/bharatsafebike.png.png',
-    imageAlt: 'BharatSafe bike QR tag attached to a motorcycle',
-    price: 399
-  },
-  car: {
-    label: 'CAR',
-    title: window.BHARATSAFE_PRODUCTS.car.title,
-    description: window.BHARATSAFE_PRODUCTS.car,
-    image: '/bharatsafecar.png.png',
-    imageAlt: 'BharatSafe car QR tag attached to a car',
-    price: 500
-  },
-  luggage: {
-    label: 'LUGGAGE',
-    title: window.BHARATSAFE_PRODUCTS.luggage.title,
-    description: window.BHARATSAFE_PRODUCTS.luggage,
-    image: '/bhararsafeluggage.png.png',
-    imageAlt: 'BharatSafe QR tag attached to luggage',
-    price: 399
-  }
+  bike: { ...window.BHARATSAFE_PRODUCTS.bike },
+  car: { ...window.BHARATSAFE_PRODUCTS.car },
+  luggage: { ...window.BHARATSAFE_PRODUCTS.luggage }
 };
 
 document.querySelectorAll('.selector-button').forEach((button) => {
@@ -40,16 +19,17 @@ document.querySelectorAll('.selector-button').forEach((button) => {
     const previewImage = document.querySelector('#preview-image');
     const productPrice = document.querySelector('#productPrice');
     const buyNowButton = document.querySelector('#buyNowButton');
+    const productDetailLink = document.querySelector('#productDetailLink');
     if (previewType && previewTitle && data) {
       previewType.textContent = data.label;
-      previewTitle.innerHTML = data.title;
+      previewTitle.textContent = data.title;
     }
     if (previewImage && data) {
       previewImage.src = data.image;
       previewImage.alt = data.imageAlt;
     }
     if (previewDescription && data) {
-      window.renderBharatSafeProductDescription(previewDescription, data.description);
+      previewDescription.textContent = data.shortDescription;
     }
     if (productPrice && data) {
       productPrice.textContent = `₹${data.price}`;
@@ -57,16 +37,17 @@ document.querySelectorAll('.selector-button').forEach((button) => {
     if (buyNowButton && data) {
       buyNowButton.href = `get-qr.html?type=${encodeURIComponent(button.dataset.type)}`;
     }
+    if (productDetailLink && data) {
+      productDetailLink.href = `product.html?type=${encodeURIComponent(button.dataset.type)}`;
+      productDetailLink.setAttribute('aria-label', `View ${data.title} details`);
+    }
   });
 });
 
 const initialProductType = document.querySelector('.selector-button.active')?.dataset.type;
 const initialPreviewDescription = document.querySelector('#preview-description');
 if (initialProductType && initialPreviewDescription) {
-  window.renderBharatSafeProductDescription(
-    initialPreviewDescription,
-    typeData[initialProductType].description
-  );
+  initialPreviewDescription.textContent = typeData[initialProductType].shortDescription;
 }
 
 const heroCarousel = document.querySelector('#heroCarousel');
