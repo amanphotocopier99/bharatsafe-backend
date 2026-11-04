@@ -21,7 +21,7 @@ if (!product) {
   image.alt = product.imageAlt;
 
   const buyNowButton = document.querySelector('#productBuyNow');
-  buyNowButton.href = `get-qr.html?type=${encodeURIComponent(productType)}`;
+  buyNowButton.href = `/get-qr?type=${encodeURIComponent(productType)}`;
 
   window.renderBharatSafeProductDescription(
     document.querySelector('#productDetailDescription'),

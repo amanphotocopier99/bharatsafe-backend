@@ -215,7 +215,7 @@ router.post('/orders', async (req, res) => {
     return res.status(500).json({ error: 'Could not create your order. Please try again.' });
   }
 
-  const returnUrl = new URL('/get-qr.html', config.appUrl);
+  const returnUrl = new URL('/get-qr', config.appUrl);
   returnUrl.searchParams.set('order_id', orderId);
 
   try {

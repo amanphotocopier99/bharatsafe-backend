@@ -35,10 +35,10 @@ document.querySelectorAll('.selector-button').forEach((button) => {
       productPrice.textContent = `₹${data.price}`;
     }
     if (buyNowButton && data) {
-      buyNowButton.href = `get-qr.html?type=${encodeURIComponent(button.dataset.type)}`;
+      buyNowButton.href = `/get-qr?type=${encodeURIComponent(button.dataset.type)}`;
     }
     if (productDetailLink && data) {
-      productDetailLink.href = `product.html?type=${encodeURIComponent(button.dataset.type)}`;
+      productDetailLink.href = `/product?type=${encodeURIComponent(button.dataset.type)}`;
       productDetailLink.setAttribute('aria-label', `View ${data.title} details`);
     }
   });

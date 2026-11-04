@@ -22,8 +22,25 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 
-// Serve static files from public/ (logo.png lives here)
-app.use(express.static(path.join(__dirname, 'public')));
+const cleanPagePaths = new Map([
+  ['/index.html', '/'],
+  ['/about-us.html', '/about-us'],
+  ['/blog.html', '/blog'],
+  ['/get-qr.html', '/get-qr'],
+  ['/product.html', '/product'],
+  ['/admin.html', '/admin']
+]);
+
+app.use((req, res, next) => {
+  const cleanPath = cleanPagePaths.get(req.path);
+  if (cleanPath) {
+    return res.redirect(301, `${cleanPath}${req.url.slice(req.path.length)}`);
+  }
+  next();
+});
+
+// Serve static files and resolve extensionless page URLs to their HTML files.
+app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 
 // API routes
 app.use('/api', require('./routes/auth'));
