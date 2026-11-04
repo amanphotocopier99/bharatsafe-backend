@@ -13,7 +13,11 @@ const PRODUCTS = {
   car: 'Car',
   luggage: 'Luggage'
 };
-const PRICE_INR = 149;
+const PRODUCT_PRICES_INR = {
+  bike: 399,
+  car: 500,
+  luggage: 399
+};
 const TAG_COUNTER_ID = 'customer-tag';
 
 class CashfreeRequestError extends Error {
@@ -202,7 +206,7 @@ router.post('/orders', async (req, res) => {
       blood_group: customer.bloodGroup,
       emergency_contact: customer.emergencyContact,
       tag_type: customer.tagType,
-      amount: PRICE_INR,
+      amount: PRODUCT_PRICES_INR[customer.tagType],
       currency: 'INR',
       status: 'CREATING'
     });
@@ -220,7 +224,7 @@ router.post('/orders', async (req, res) => {
       headers: { 'x-idempotency-key': crypto.randomUUID() },
       body: JSON.stringify({
         order_id: orderId,
-        order_amount: PRICE_INR,
+        order_amount: order.amount,
         order_currency: 'INR',
         customer_details: {
           customer_id: orderId,

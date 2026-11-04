@@ -28,6 +28,12 @@
     .checkout-notice[data-state="success"] p { color: #245c32; }
     .checkout-notice small { display: block; margin-top: .5rem; color: #66551f; }
     .checkout-notice button { margin-top: 1rem; border: 0; border-radius: 10px; padding: .75rem 1rem; background: #1e1e1e; color: #fff; cursor: pointer; }
+    .checkout-product-details { margin: 0 0 1.5rem; padding: 1.25rem; border: 1px solid #e8e4dc; border-radius: 16px; background: #faf9f6; }
+    .checkout-product-details h2 { margin: 0 0 .75rem; font-size: 1.25rem; line-height: 1.35; }
+    .product-description p { margin: 0 0 .8rem; color: #4a4a4a; line-height: 1.6; }
+    .product-description ul { margin: .4rem 0 .9rem; padding-left: 1.25rem; color: #4a4a4a; }
+    .product-description li { margin: .35rem 0; line-height: 1.5; }
+    .product-description-closing { font-weight: 600; }
   </style>
 </head>
 <body>
@@ -104,11 +110,16 @@
             <label for="tagType">Product</label>
             <select id="tagType" name="tagType" required>
               <option value="" disabled selected>Select a product</option>
-              <option value="bike">Bike tag — ₹149</option>
-              <option value="car">Car tag — ₹149</option>
-              <option value="luggage">Luggage tag — ₹149</option>
+              <option value="bike">BharatSafe Bike Emergency QR Safety Sticker — ₹399</option>
+              <option value="car">BharatSafe Car Emergency QR Safety Sticker — ₹500</option>
+              <option value="luggage">BharatSafe Smart Luggage QR Safety Sticker — ₹399</option>
             </select>
           </div>
+
+          <section class="checkout-product-details" id="checkoutProductDetails" hidden aria-live="polite" aria-labelledby="checkoutProductTitle">
+            <h2 id="checkoutProductTitle"></h2>
+            <div class="product-description" id="checkoutProductDescription"></div>
+          </section>
 
           <button type="submit" class="button button-dark button-full" id="submitBtn">
             Continue to payment <span aria-hidden="true">↗</span>
@@ -150,6 +161,7 @@
 
   <script src="cursor.js"></script>
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+  <script src="products.js"></script>
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('qrDetailsForm');
@@ -160,8 +172,11 @@
     const submitButton = document.getElementById('submitBtn');
     const checkPaymentButton = document.getElementById('checkPaymentBtn');
     const retryPaymentButton = document.getElementById('retryPaymentBtn');
+    const productDetails = document.getElementById('checkoutProductDetails');
+    const productTitle = document.getElementById('checkoutProductTitle');
+    const productDescription = document.getElementById('checkoutProductDescription');
 
-    if (!form || !checkoutNotice || !checkoutMessage || !checkoutDetails || !tagSelect || !submitButton) return;
+    if (!form || !checkoutNotice || !checkoutMessage || !checkoutDetails || !tagSelect || !submitButton || !productDetails || !productTitle || !productDescription) return;
 
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('order_id');
@@ -169,6 +184,18 @@
     if (preselectedType && ['bike', 'car', 'luggage'].includes(preselectedType)) {
       tagSelect.value = preselectedType;
     }
+
+    function updateProductDetails() {
+      const product = window.BHARATSAFE_PRODUCTS[tagSelect.value];
+      productDetails.hidden = !product;
+      if (!product) return;
+
+      productTitle.textContent = product.title;
+      window.renderBharatSafeProductDescription(productDescription, product);
+    }
+
+    tagSelect.addEventListener('change', updateProductDetails);
+    updateProductDetails();
 
     function showNotice(message, details, state) {
       checkoutMessage.textContent = message;
