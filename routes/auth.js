@@ -9,8 +9,15 @@ const adminPassword = process.env.ADMIN_PASSWORD;
 const adminPassHash = adminPassword ? bcrypt.hashSync(adminPassword, 10) : null;
 
 router.post('/login', (req, res) => {
-  if (!adminUser || !adminPassHash || !process.env.JWT_SECRET) {
-    return res.status(503).json({ error: 'Admin authentication is not configured' });
+  const missingSettings = [
+    !adminUser && 'ADMIN_USERNAME',
+    !adminPassHash && 'ADMIN_PASSWORD',
+    !process.env.JWT_SECRET && 'JWT_SECRET'
+  ].filter(Boolean);
+  if (missingSettings.length) {
+    return res.status(503).json({
+      error: `Admin authentication is not configured. Missing: ${missingSettings.join(', ')}.`
+    });
   }
 
   const { username, password } = req.body || {};
