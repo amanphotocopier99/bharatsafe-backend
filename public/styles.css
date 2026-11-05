@@ -1117,6 +1117,37 @@
   display: none;
 }
 
+.about-rule {
+  border-top: 0;
+}
+
+.about-point,
+.about-quote {
+  border-top: 0;
+}
+
+.about-values {
+  gap: 20px;
+  border: 0;
+  background: transparent;
+}
+
+.faq details {
+  border-top: 0;
+}
+
+.feature-number,
+.step > span,
+.step-line,
+#heroCarouselCount {
+  display: none;
+}
+
+.testimonial-card {
+  border-top: 0;
+  border-bottom: 0;
+}
+
 .tag-builder {
   align-items: center;
 }
@@ -1165,7 +1196,7 @@
   width: 100%;
   margin: 22px 0 16px;
   padding-top: 20px;
-  border-top: 1px solid #e8e4dc;
+  border-top: 0;
 }
 
 .product-card-purchase .price-line strong {
@@ -1182,7 +1213,7 @@
 
 .preview-foot {
   padding-top: 14px;
-  border-top: 1px solid #eeeae3;
+  border-top: 0;
   color: #625e58;
 }
 
