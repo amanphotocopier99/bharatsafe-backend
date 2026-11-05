@@ -1,9 +1,9 @@
+console.log("JWT_SECRET exists:", !!process.env.JWT_SECRET, "length:", process.env.JWT_SECRET?.length);
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const mongoose = require('mongoose');
-
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
