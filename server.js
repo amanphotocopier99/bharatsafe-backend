@@ -20,7 +20,7 @@ mongoose.connect(MONGODB_URI)
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '5mb' }));
 
 const cleanPagePaths = new Map([
   ['/index.html', '/'],
@@ -44,6 +44,7 @@ app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] })
 
 // API routes
 app.use('/api', require('./routes/auth'));
+app.use('/api/content', require('./routes/content'));
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/tags', require('./routes/tags'));
@@ -51,6 +52,10 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 app.get('/s/:scanCode', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'scan.html'));
+});
+
+app.get('/product-:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'product.html'));
 });
 
 // SPA fallback — do NOT swallow file or API requests

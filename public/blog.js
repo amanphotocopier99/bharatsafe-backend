@@ -1,16 +1,85 @@
-const storageKey = 'bharatsafe_blog_posts';
-const fallbackPosts = [
-  { id: 'welcome', title: 'One scan can save a life', category: 'Safety', excerpt: 'Why sharing the right emergency details before you need them is one of the simplest acts of care.', content: 'Emergencies are difficult enough without having to remember every important detail. BharatSafe gives families, riders, and travellers a simple way to make critical information available when every second matters.', published: true, date: '2026-09-22' },
-  { id: 'travel-ready', title: 'A calmer way to travel', category: 'Travel', excerpt: 'Small habits that help you stay ready for the unexpected, from a weekend ride to a long journey.', content: 'The best safety tools are the ones you set up before you need them. Keep your emergency contacts current, add useful medical notes, and make sure your BharatSafe tag is visible.', published: true, date: '2026-09-20' }
-];
+function formatDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? 'Recently'
+    : new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+}
 
-function getPosts() { return JSON.parse(localStorage.getItem(storageKey) || JSON.stringify(fallbackPosts)); }
-function formatDate(value) { return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(value)); }
-function renderPosts() {
-  const posts = getPosts().filter((post) => post.published);
+function renderPosts(posts) {
   const grid = document.querySelector('#post-grid');
   document.querySelector('#post-count').textContent = `${posts.length} ${posts.length === 1 ? 'story' : 'stories'}`;
-  if (!posts.length) { grid.innerHTML = '<div class="empty-posts"><h2>Stories are on their way.</h2><p>Check back soon for new stories.</p></div>'; return; }
-  grid.innerHTML = posts.map((post, index) => `<article class="post-card ${index === 0 ? 'featured-post' : ''}"><div class="post-art post-art-${index % 3}"><span>${String(index + 1).padStart(2, '0')}</span><strong>${post.category}</strong></div><div class="post-meta"><span>${post.category}</span><span>${formatDate(post.date)}</span></div><h2>${post.title}</h2><p>${post.excerpt}</p><details><summary>Read story <span>↗</span></summary><div class="story-content">${post.content.split('\n').map((line) => `<p>${line}</p>`).join('')}</div></details></article>`).join('');
+  grid.replaceChildren();
+
+  if (!posts.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-posts';
+    const heading = document.createElement('h2');
+    heading.textContent = 'Stories are on their way.';
+    const message = document.createElement('p');
+    message.textContent = 'Check back soon for new stories.';
+    empty.append(heading, message);
+    grid.append(empty);
+    return;
+  }
+
+  posts.forEach((post, index) => {
+    const card = document.createElement('article');
+    card.className = `post-card ${index === 0 ? 'featured-post' : ''}`;
+    card.id = post.slug;
+
+    const artwork = document.createElement('div');
+    artwork.className = `post-art post-art-${index % 3}`;
+    if (post.cover) {
+      const cover = document.createElement('img');
+      cover.src = post.cover;
+      cover.alt = '';
+      cover.loading = 'lazy';
+      artwork.append(cover);
+    }
+    const categoryBadge = document.createElement('strong');
+    categoryBadge.textContent = post.category;
+    artwork.append(categoryBadge);
+
+    const meta = document.createElement('div');
+    meta.className = 'post-meta';
+    const category = document.createElement('span');
+    category.textContent = post.category;
+    const date = document.createElement('span');
+    date.textContent = formatDate(post.date);
+    meta.append(category, date);
+
+    const title = document.createElement('h2');
+    title.textContent = post.title;
+    const excerpt = document.createElement('p');
+    excerpt.textContent = post.excerpt;
+
+    const details = document.createElement('details');
+    const summary = document.createElement('summary');
+    summary.textContent = 'Read story ↗';
+    const content = document.createElement('div');
+    content.className = 'story-content';
+    String(post.content || '').split(/\r?\n/).filter(Boolean).forEach((line) => {
+      const paragraph = document.createElement('p');
+      paragraph.textContent = line;
+      content.append(paragraph);
+    });
+    details.append(summary, content);
+    card.append(artwork, meta, title, excerpt, details);
+    grid.append(card);
+  });
 }
-renderPosts();
+
+(async () => {
+  const grid = document.querySelector('#post-grid');
+  try {
+    const response = await fetch('/api/content/posts');
+    if (!response.ok) throw new Error('Could not load journal stories.');
+    renderPosts(await response.json());
+  } catch (error) {
+    console.error('Journal load failed:', error);
+    const message = document.createElement('p');
+    message.className = 'empty-posts';
+    message.textContent = 'Journal stories are temporarily unavailable. Please try again later.';
+    grid.replaceChildren(message);
+  }
+})();

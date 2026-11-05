@@ -34,7 +34,7 @@ router.post('/', async (req, res) => {
 router.get('/', requireAuth, async (req, res) => {
   try {
     const leads = await Lead.find().sort({ created_at: -1, _id: -1 });
-    res.json(leads);
+    res.json(leads.map((lead) => ({ ...lead.toObject(), id: String(lead._id) })));
   } catch (err) {
     console.error('Fetch leads error:', err.message);
     res.status(500).json({ error: 'Failed to fetch leads' });

@@ -8,7 +8,7 @@ const paymentOrderSchema = new mongoose.Schema({
   address: { type: String, required: true },
   blood_group: { type: String, enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], required: true },
   emergency_contact: { type: String, default: null },
-  tag_type: { type: String, enum: ['bike', 'car', 'luggage'], required: true },
+  tag_type: { type: String, required: true },
   amount: { type: Number, required: true },
   currency: { type: String, default: 'INR', required: true },
   status: { type: String, default: 'CREATING', required: true },

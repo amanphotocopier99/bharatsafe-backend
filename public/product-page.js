@@ -1,11 +1,25 @@
-const productType = new URLSearchParams(window.location.search).get('type');
-const product = window.BHARATSAFE_PRODUCTS[productType];
 const productDetail = document.querySelector('#productDetail');
 const productNotFound = document.querySelector('#productNotFound');
 
-if (!product) {
-  productNotFound.hidden = false;
-} else {
+(async () => {
+  const slugFromPath = window.location.pathname.match(/^\/product-(.+)$/)?.[1];
+  const productSlug = slugFromPath || new URLSearchParams(window.location.search).get('type');
+  let products;
+  try {
+    products = await window.loadBharatSafeProducts();
+  } catch (error) {
+    console.error('Product detail load failed:', error);
+    productNotFound.hidden = false;
+    productNotFound.querySelector('h1').textContent = 'Product details are unavailable.';
+    return;
+  }
+  const product = products[productSlug];
+
+  if (!product) {
+    productNotFound.hidden = false;
+    return;
+  }
+
   productDetail.hidden = false;
   document.title = `${product.title} | BharatSafe`;
 
@@ -17,11 +31,12 @@ if (!product) {
   document.querySelector('#productDetailKicker').textContent = product.label;
 
   const image = document.querySelector('#productDetailImage');
-  image.src = product.image;
+  if (product.image) image.src = product.image;
+  else image.hidden = true;
   image.alt = product.imageAlt;
 
   const buyNowButton = document.querySelector('#productBuyNow');
-  buyNowButton.href = `/get-qr?type=${encodeURIComponent(productType)}`;
+  buyNowButton.href = `/get-qr?type=${encodeURIComponent(product.slug)}`;
 
   window.renderBharatSafeProductDescription(
     document.querySelector('#productDetailDescription'),
@@ -41,4 +56,4 @@ if (!product) {
     item.append(heading, response);
     faqList.append(item);
   });
-}
+})();

@@ -34,13 +34,13 @@
     .product-description ul { margin: .4rem 0 .9rem; padding-left: 1.25rem; color: #4a4a4a; }
     .product-description li { margin: .35rem 0; line-height: 1.5; }
     .product-description-closing { font-weight: 600; }
-    html.checkout-embedded, html.checkout-embedded body { min-height: 100%; overflow: hidden; }
+    html.checkout-embedded, html.checkout-embedded body { min-height: 100%; overflow-x: hidden; overflow-y: auto; }
     html.checkout-embedded .site-header, html.checkout-embedded .site-footer,
     html.checkout-embedded .form-card > .section-kicker,
     html.checkout-embedded .form-card > .back-link,
     html.checkout-embedded .checkout-product-details { display: none !important; }
     html.checkout-embedded main { min-height: 100%; }
-    html.checkout-embedded .form-wrap { width: 100%; max-width: 620px; height: 100%; overflow-y: auto; padding: 12px; }
+    html.checkout-embedded .form-wrap { width: 100%; max-width: 620px; min-height: 100%; padding: 12px; }
     html.checkout-embedded .form-card { padding: 20px; border-radius: 20px; box-shadow: none; }
     html.checkout-embedded .form-card h1 { margin: 0 0 .6rem; font-size: clamp(1.7rem, 5vw, 2.1rem); }
     html.checkout-embedded .form-card > p { margin-bottom: 1rem !important; font-size: .92rem !important; }
@@ -135,9 +135,6 @@
             <label for="tagType">Product</label>
             <select id="tagType" name="tagType" required>
               <option value="" disabled selected>Select a product</option>
-              <option value="bike">BharatSafe Bike Emergency QR Safety Sticker — ₹399</option>
-              <option value="car">BharatSafe Car Emergency QR Safety Sticker — ₹500</option>
-              <option value="luggage">BharatSafe Smart Luggage QR Safety Sticker — ₹399</option>
             </select>
           </div>
 
@@ -206,9 +203,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('order_id');
     const preselectedType = urlParams.get('type');
-    if (preselectedType && ['bike', 'car', 'luggage'].includes(preselectedType)) {
-      tagSelect.value = preselectedType;
-    }
 
     function updateProductDetails() {
       const product = window.BHARATSAFE_PRODUCTS[tagSelect.value];
@@ -221,19 +215,37 @@
       summary.textContent = product.shortDescription;
       productDescription.append(summary);
       const detailsLink = document.createElement('a');
-      detailsLink.href = `/product?type=${encodeURIComponent(tagSelect.value)}`;
+      detailsLink.href = `/product-${encodeURIComponent(product.slug)}`;
       detailsLink.textContent = 'View full product details';
       productDescription.append(detailsLink);
     }
 
     tagSelect.addEventListener('change', updateProductDetails);
-    updateProductDetails();
 
     function showNotice(message, details, state) {
       checkoutMessage.textContent = message;
       checkoutDetails.textContent = details || '';
       checkoutNotice.dataset.state = state || 'info';
       checkoutNotice.style.display = 'block';
+    }
+
+    async function loadProductOptions() {
+      submitButton.disabled = true;
+      try {
+        const products = await window.loadBharatSafeProducts();
+        tagSelect.replaceChildren(new Option('Select a product', '', true, true));
+        Object.values(products).forEach((product) => {
+          tagSelect.add(new Option(`${product.title} — ₹${product.price}`, product.slug));
+        });
+        if (preselectedType && products[preselectedType]) tagSelect.value = preselectedType;
+        else if (Object.keys(products).length === 1) tagSelect.value = Object.keys(products)[0];
+        updateProductDetails();
+      } catch (error) {
+        console.error('Checkout product list failed:', error);
+        showNotice('Products could not be loaded.', 'Please refresh this page before placing your order.', 'info');
+      } finally {
+        submitButton.disabled = false;
+      }
     }
 
     async function openCheckout(paymentSessionId, mode) {
@@ -307,6 +319,8 @@
       checkPaymentStatus(orderId);
       return;
     }
+
+    loadProductOptions();
 
     form.addEventListener('submit', async function (e) {
       e.preventDefault();

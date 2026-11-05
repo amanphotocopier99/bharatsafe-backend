@@ -141,6 +141,23 @@
     container.append(closing);
   }
 
-  window.BHARATSAFE_PRODUCTS = products;
-  window.renderBharatSafeProductDescription = renderDescription;
+  Object.entries(products).forEach(([slug, product]) => {
+    product.slug = slug;
+  });
+
+  if (typeof window !== 'undefined') {
+    window.BHARATSAFE_PRODUCTS = products;
+    window.loadBharatSafeProducts = async function () {
+      const response = await fetch('/api/content/products');
+      if (!response.ok) throw new Error('Could not load products from the storefront.');
+      const currentProducts = await response.json();
+      window.BHARATSAFE_PRODUCTS = Object.fromEntries(
+        currentProducts.map((product) => [product.slug, product])
+      );
+      return window.BHARATSAFE_PRODUCTS;
+    };
+    window.renderBharatSafeProductDescription = renderDescription;
+  }
+
+  if (typeof module !== 'undefined') module.exports = products;
 })();

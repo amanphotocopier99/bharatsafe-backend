@@ -5,19 +5,10 @@ const requireAuth = require('../middleware/auth');
 const PaymentOrder = require('../models/PaymentOrder');
 const Tag = require('../models/Tag');
 const TagCounter = require('../models/TagCounter');
+const StoreProduct = require('../models/StoreProduct');
 
 const router = express.Router();
 const API_VERSION = '2025-01-01';
-const PRODUCTS = {
-  bike: 'Bike',
-  car: 'Car',
-  luggage: 'Luggage'
-};
-const PRODUCT_PRICES_INR = {
-  bike: 399,
-  car: 500,
-  luggage: 399
-};
 const TAG_COUNTER_ID = 'customer-tag';
 
 class CashfreeRequestError extends Error {
@@ -175,7 +166,9 @@ function getCustomerDetails(body) {
     address.length > 500 ||
     !['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].includes(bloodGroup) ||
     (emergencyContactNumber && !emergencyContact) ||
-    !Object.prototype.hasOwnProperty.call(PRODUCTS, tagType)
+    typeof tagType !== 'string' ||
+    tagType.length > 80 ||
+    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(tagType)
   ) {
     return null;
   }
@@ -194,6 +187,17 @@ router.post('/orders', async (req, res) => {
     return res.status(400).json({ error: 'Enter valid contact and delivery details' });
   }
 
+  let product;
+  try {
+    product = await StoreProduct.findOne({ slug: customer.tagType }).lean();
+  } catch (error) {
+    console.error('Payment product lookup failed:', error.message);
+    return res.status(500).json({ error: 'Could not verify the selected product.' });
+  }
+  if (!product) {
+    return res.status(400).json({ error: 'The selected product is no longer available.' });
+  }
+
   const orderId = `bs_${crypto.randomUUID().replace(/-/g, '')}`;
   let order;
   try {
@@ -206,7 +210,7 @@ router.post('/orders', async (req, res) => {
       blood_group: customer.bloodGroup,
       emergency_contact: customer.emergencyContact,
       tag_type: customer.tagType,
-      amount: PRODUCT_PRICES_INR[customer.tagType],
+      amount: product.price,
       currency: 'INR',
       status: 'CREATING'
     });
@@ -233,7 +237,7 @@ router.post('/orders', async (req, res) => {
           customer_phone: customer.phone
         },
         order_meta: { return_url: returnUrl.toString() },
-        order_note: `BharatSafe ${PRODUCTS[customer.tagType]} tag`
+        order_note: `BharatSafe ${product.label} tag`
       })
     });
 

@@ -132,24 +132,24 @@
     <nav class="desktop-nav" aria-label="Admin navigation">
       <a href="/">View website</a>
       <a href="/blog">View journal</a>
-      <a href="/get-qr">Buy now</a>
     </nav>
-    <span class="admin-badge">Admin Hub</span>
-    <a class="header-cta" href="/get-qr">Buy now <span aria-hidden="true">↗</span></a>
+    <span class="admin-badge">Admin Workspace</span>
+    <button id="admin-logout-btn" class="admin-logout" type="button" hidden>Sign out</button>
   </header>
 
-  <div id="admin-login-box" style="max-width:420px;margin:40px auto;padding:32px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:16px;">
-    <h2 style="margin-top:0;">Admin login</h2>
-    <p style="opacity:.7;font-size:.9rem;margin-bottom:20px;">Sign in to open the admin dashboard.</p>
-    <label style="display:block;margin-bottom:12px;">
-      <span style="display:block;font-size:.85rem;opacity:.7;margin-bottom:6px;">Username</span>
+  <div id="admin-login-box" class="admin-login-card">
+    <p class="eyebrow"><span class="eyebrow-dot"></span> Private access</p>
+    <h2>Welcome back.</h2>
+    <p>Sign in with your administrator credentials to manage the live BharatSafe website.</p>
+    <label class="admin-login-field">
+      <span>Username</span>
       <input id="admin-username" type="text" autocomplete="username"
-             style="width:100%;padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:inherit;font-size:1rem;" />
+             />
     </label>
-    <label style="display:block;margin-bottom:20px;">
-      <span style="display:block;font-size:.85rem;opacity:.7;margin-bottom:6px;">Password</span>
+    <label class="admin-login-field">
+      <span>Password</span>
       <input id="admin-password" type="password" autocomplete="current-password"
-             style="width:100%;padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:inherit;font-size:1rem;" />
+             />
     </label>
     <button id="admin-login-btn" class="button button-dark" type="button" style="width:100%;">
       Sign in <span aria-hidden="true">↗</span>
@@ -158,6 +158,7 @@
   </div>
 
   <main class="admin-shell" style="display:none;">
+    <p id="admin-global-message" class="admin-global-message" role="status" hidden></p>
     <div class="admin-heading">
       <div>
         <p class="eyebrow"><span class="eyebrow-dot"></span> Central control panel</p>
@@ -188,6 +189,9 @@
           <form id="post-form">
             <label>Title
               <input id="post-title" required maxlength="90" placeholder="A safer way to travel with children" />
+            </label>
+            <label>Story URL slug
+              <input id="post-slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="a-safer-way-to-travel" />
             </label>
             <label>Category
               <select id="post-category">
@@ -233,7 +237,7 @@
       <section class="posts-manager" style="margin-top: 36px;">
         <div class="panel-heading">
           <h2>Your stories</h2>
-          <span id="empty-label">Saved in this browser</span>
+          <span id="empty-label">Published to the website</span>
         </div>
         <div id="admin-post-list"></div>
       </section>
@@ -248,26 +252,43 @@
             <button class="text-button" id="cancel-product-edit" type="button" hidden>Cancel</button>
           </div>
           <form id="product-form">
-            <label>Product / Tag Title
-              <input id="prod-title" required placeholder="e.g. BharatSafe Bike Helmet Tag" />
+            <label>Product title
+              <input id="prod-title" required maxlength="140" placeholder="e.g. BharatSafe Bike Helmet Tag" />
             </label>
-            <label>Category
-              <select id="prod-category">
-                <option value="bike">Bike</option>
-                <option value="car">Car</option>
-                <option value="luggage">Luggage</option>
-                <option value="pet">Pet / General</option>
-              </select>
+            <label>Product URL slug
+              <input id="prod-slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="luggage" />
+              <small>The product page will be available at /product-luggage.</small>
+            </label>
+            <label>Category / tag type
+              <input id="prod-category" required maxlength="40" placeholder="e.g. luggage, pet" />
             </label>
             <label>Price (₹)
-              <input type="number" id="prod-price" required placeholder="399" />
+              <input type="number" id="prod-price" min="1" step="1" required placeholder="399" />
             </label>
             <label>Product Image
               <input type="file" id="prod-img" accept="image/*" />
               <img id="prod-img-preview" class="img-preview-box" alt="Product Preview" />
             </label>
-            <label>Tag Subtitle / Description
-              <textarea id="prod-desc" rows="3" placeholder="Weatherproof, reflective, 3M adhesive..."></textarea>
+            <label>Short description
+              <textarea id="prod-short-description" rows="2" maxlength="300" required placeholder="A short product card and checkout description."></textarea>
+            </label>
+            <label>Image description (accessibility)
+              <input id="prod-image-alt" maxlength="250" placeholder="Describe the product photo" />
+            </label>
+            <label>Product introduction
+              <textarea id="prod-desc" rows="3" placeholder="A short introduction on the product detail page."></textarea>
+            </label>
+            <label>Detailed paragraphs <small>(one paragraph per line)</small>
+              <textarea id="prod-paragraphs" rows="5" placeholder="Describe the product and how to use it."></textarea>
+            </label>
+            <label>Key features <small>(one feature per line)</small>
+              <textarea id="prod-features" rows="5" placeholder="Unique QR code linked to your profile."></textarea>
+            </label>
+            <label>Closing message
+              <input id="prod-closing" placeholder="A short closing line for the product page." />
+            </label>
+            <label>FAQs <small>(one question and answer per line, separated by |)</small>
+              <textarea id="prod-faqs" rows="4" placeholder="Where should I place it? | Place it somewhere easy to scan."></textarea>
             </label>
             <button class="button button-dark" type="submit">
               <span id="prod-submit-label">Save product</span> <span>↗</span>
@@ -281,7 +302,7 @@
             <h2>Inventory status</h2>
           </div>
           <div class="detail-card"><span>Active tags</span><strong id="stat-active-tags">0</strong></div>
-          <div class="detail-card"><span>Product prices</span><strong>₹399–₹500</strong></div>
+          <div class="detail-card"><span>Catalog</span><strong>Managed here</strong></div>
           <div class="detail-card"><span>Fulfillment</span><strong>India Post / Courier</strong></div>
         </aside>
       </div>
@@ -350,7 +371,6 @@
     <div class="panel-heading">
       <h2>User form submissions & emergency activations</h2>
       <div>
-        <button id="admin-logout-btn" class="text-button" type="button" style="margin-right:12px;">Log out</button>
         <button id="export-leads-btn" class="text-button" type="button">Export to CSV ↓</button>
       </div>
     </div>
