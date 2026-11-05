@@ -34,7 +34,32 @@
     .product-description ul { margin: .4rem 0 .9rem; padding-left: 1.25rem; color: #4a4a4a; }
     .product-description li { margin: .35rem 0; line-height: 1.5; }
     .product-description-closing { font-weight: 600; }
+    html.checkout-embedded, html.checkout-embedded body { min-height: 100%; overflow: hidden; }
+    html.checkout-embedded .site-header, html.checkout-embedded .site-footer,
+    html.checkout-embedded .form-card > .section-kicker,
+    html.checkout-embedded .form-card > .back-link,
+    html.checkout-embedded .checkout-product-details { display: none !important; }
+    html.checkout-embedded main { min-height: 100%; }
+    html.checkout-embedded .form-wrap { width: 100%; max-width: 620px; height: 100%; overflow-y: auto; padding: 12px; }
+    html.checkout-embedded .form-card { padding: 20px; border-radius: 20px; box-shadow: none; }
+    html.checkout-embedded .form-card h1 { margin: 0 0 .6rem; font-size: clamp(1.7rem, 5vw, 2.1rem); }
+    html.checkout-embedded .form-card > p { margin-bottom: 1rem !important; font-size: .92rem !important; }
+    html.checkout-embedded .form-group { margin-bottom: .85rem; }
+    html.checkout-embedded .form-group input, html.checkout-embedded .form-group select { min-height: 44px; padding: .65rem .8rem; }
+    html.checkout-embedded .form-row { gap: .8rem; }
+    html.checkout-embedded .button-full { min-height: 46px; }
+    html.checkout-embedded .checkout-notice { padding: .9rem; margin-top: 1rem; }
+    @media (max-width: 560px) {
+      html.checkout-embedded .form-wrap { padding: 8px; }
+      html.checkout-embedded .form-card { padding: 16px; }
+      html.checkout-embedded .form-row { grid-template-columns: 1fr; gap: 0; }
+    }
   </style>
+  <script>
+    if (new URLSearchParams(window.location.search).get('embed') === '1') {
+      document.documentElement.classList.add('checkout-embedded');
+    }
+  </script>
 </head>
 <body>
 
@@ -219,7 +244,7 @@
       const cashfree = window.Cashfree({ mode });
       const result = await cashfree.checkout({
         paymentSessionId,
-        redirectTarget: '_self'
+        redirectTarget: new URLSearchParams(window.location.search).get('embed') === '1' ? '_top' : '_self'
       });
 
       if (result && result.error) {
