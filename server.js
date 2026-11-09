@@ -27,6 +27,9 @@ const cleanPagePaths = new Map([
   ['/about-us.html', '/about-us'],
   ['/blog.html', '/blog'],
   ['/get-qr.html', '/get-qr'],
+  ['/return-policy.html', '/return-policy'],
+  ['/shipping-delivery.html', '/shipping-delivery'],
+  ['/payment-info.html', '/payment-info'],
   ['/product.html', '/product'],
   ['/admin.html', '/admin']
 ]);
